@@ -3,693 +3,350 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rose Flower with Falling Petals</title>
+    <title>VT-100 Countdown Timer</title>
     <style>
-        body {
+        * {
             margin: 0;
-            padding: 20px;
-            background: #ffffff;
+            padding: 0;
+            box-sizing: border-box;
+        }
+       
+        body {
+            background-color: #000;
+            color: #0f0;
+            font-family: 'VT323', monospace;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: 'Georgia', serif;
+            padding: 20px;
             overflow: hidden;
         }
        
-        .container {
+        .crt {
+            background-color: #001100;
+            border: 15px solid #333;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 700px;
+            height: 500px;
             position: relative;
-            background: rgba(255,255,255,0.95);
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.3);
-            backdrop-filter: blur(10px);
-            overflow: visible;
-            padding: 20px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+            overflow: hidden;
         }
        
-        svg {
-            display: block;
-            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.1));
-        }
-       
-        .petal {
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            transform-origin: center;
-        }
-       
-        .petal:hover {
-            transform: scale(1.05);
-            filter: brightness(1.1) saturate(1.2);
-        }
-       
-        .falling {
-            pointer-events: none;
-            z-index: 10;
-        }
-       
-        .fall-straight {
-            animation: fallStraight 3.5s ease-in forwards;
-        }
-       
-        .fall-spiral {
-            animation: fallSpiral 4s ease-out forwards;
-        }
-       
-        .fall-drift {
-            animation: fallDrift 5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-        }
-       
-        .fall-flutter {
-            animation: fallFlutter 4.5s ease-in-out forwards;
-        }
-       
-        .fall-tumble {
-            animation: fallTumble 3s linear forwards;
-        }
-       
-        @keyframes fallStraight {
-            0% {
-                transform: translateY(0) rotate(0deg) scale(1);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(800px) rotate(15deg) scale(0.3);
-                opacity: 0;
-            }
-        }
-       
-        @keyframes fallSpiral {
-            0% {
-                transform: translateY(0) translateX(0) rotate(0deg) scale(1);
-                opacity: 1;
-            }
-            25% {
-                transform: translateY(200px) translateX(50px) rotate(90deg) scale(0.8);
-            }
-            50% {
-                transform: translateY(400px) translateX(-30px) rotate(180deg) scale(0.6);
-            }
-            75% {
-                transform: translateY(600px) translateX(40px) rotate(270deg) scale(0.4);
-            }
-            100% {
-                transform: translateY(800px) translateX(-20px) rotate(360deg) scale(0.2);
-                opacity: 0;
-            }
-        }
-       
-        @keyframes fallDrift {
-            0% {
-                transform: translateY(0) translateX(0) rotate(0deg) scale(1);
-                opacity: 1;
-            }
-            20% {
-                transform: translateY(150px) translateX(-60px) rotate(45deg) scale(0.9);
-            }
-            40% {
-                transform: translateY(300px) translateX(80px) rotate(-30deg) scale(0.7);
-            }
-            60% {
-                transform: translateY(450px) translateX(-40px) rotate(60deg) scale(0.5);
-            }
-            80% {
-                transform: translateY(650px) translateX(30px) rotate(-15deg) scale(0.3);
-            }
-            100% {
-                transform: translateY(800px) translateX(-10px) rotate(90deg) scale(0.1);
-                opacity: 0;
-            }
-        }
-       
-        @keyframes fallFlutter {
-            0% {
-                transform: translateY(0) translateX(0) rotate(0deg) scale(1);
-                opacity: 1;
-            }
-            10% {
-                transform: translateY(80px) translateX(20px) rotate(-45deg) scale(0.95);
-            }
-            20% {
-                transform: translateY(160px) translateX(-30px) rotate(30deg) scale(0.9);
-            }
-            30% {
-                transform: translateY(240px) translateX(40px) rotate(-60deg) scale(0.8);
-            }
-            40% {
-                transform: translateY(320px) translateX(-20px) rotate(45deg) scale(0.7);
-            }
-            50% {
-                transform: translateY(400px) translateX(50px) rotate(-30deg) scale(0.6);
-            }
-            70% {
-                transform: translateY(550px) translateX(-35px) rotate(75deg) scale(0.4);
-            }
-            85% {
-                transform: translateY(700px) translateX(25px) rotate(-45deg) scale(0.2);
-            }
-            100% {
-                transform: translateY(800px) translateX(0px) rotate(0deg) scale(0.1);
-                opacity: 0;
-            }
-        }
-       
-        @keyframes fallTumble {
-            0% {
-                transform: translateY(0) rotate(0deg) scale(1);
-                opacity: 1;
-            }
-            25% {
-                transform: translateY(200px) rotate(180deg) scale(0.8);
-            }
-            50% {
-                transform: translateY(400px) rotate(360deg) scale(0.6);
-            }
-            75% {
-                transform: translateY(600px) rotate(540deg) scale(0.4);
-            }
-            100% {
-                transform: translateY(800px) rotate(720deg) scale(0.2);
-                opacity: 0;
-            }
-        }
-       
-        .stem {
-            filter: drop-shadow(2px 2px 4px rgba(0,100,0,0.3));
-        }
-       
-        .leaf {
-            animation: leafSway 6s ease-in-out infinite;
-            transform-origin: bottom center;
-        }
-       
-        .leaf:nth-child(odd) {
-            animation-delay: -3s;
-        }
-       
-        @keyframes leafSway {
-            0%, 100% { transform: rotate(-2deg); }
-            50% { transform: rotate(2deg); }
-        }
-       
-        .instructions {
+        .crt::before {
+            content: "";
             position: absolute;
-            top: -60px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255,255,255,0.9);
-            padding: 12px 20px;
-            border-radius: 25px;
-            font-size: 16px;
-            color: #8B4513;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                linear-gradient(rgba(0, 30, 0, 0.1) 50%, rgba(0, 0, 0, 0.1) 50%),
+                radial-gradient(circle at 50% 50%, rgba(0, 50, 0, 0.1), rgba(0, 0, 0, 0.3));
+            background-size: 100% 4px, 100% 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+       
+        .crt::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, transparent 70%, rgba(0, 20, 0, 0.7));
+            z-index: 3;
+            pointer-events: none;
+        }
+       
+        .screen {
+            padding: 30px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1;
+        }
+       
+        .header {
             text-align: center;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            font-weight: 500;
-            letter-spacing: 0.5px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #0a0;
+            padding-bottom: 10px;
         }
        
-        .petal-trail {
-            position: absolute;
-            width: 6px;
-            height: 6px;
-            background: radial-gradient(circle, #FF69B4, #FFB6C1);
-            border-radius: 50%;
-            pointer-events: none;
-            animation: trail 2s ease-out forwards;
+        .title {
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
        
-        @keyframes trail {
-            0% {
-                opacity: 0.8;
-                transform: scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: scale(0.2);
-            }
+        .subtitle {
+            font-size: 1rem;
+            color: #0a0;
+            margin-top: 5px;
         }
        
-        .sparkle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: #FFD700;
-            border-radius: 50%;
-            pointer-events: none;
-            animation: sparkle 1.5s ease-out forwards;
-        }
-       
-        .birthday-message {
-            position: absolute;
-            top: 35%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 72px;
-            font-weight: bold;
-            background: linear-gradient(90deg, #DC143C 0%, #DC143C 50%, #1E90FF 50%, #1E90FF 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            color: transparent; /* Ensure text color is transparent */
-            display: inline-block; /* Ensure gradient applies correctly */
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Add text shadow for visibility */
+        .timer-display {
             text-align: center;
-            opacity: 0;
-            animation: fadeIn 1s ease-out forwards;
-            font-family: 'Impact', 'Arial Black', sans-serif;
+            margin: 40px 0;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
        
-        @keyframes gradientShift {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
+        .time-row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
         }
        
-        .wish-input {
-            position: absolute;
-            bottom: 28%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 400px;
-            padding: 18px 25px;
-            font-size: 20px;
-            border: 3px solid #9370DB;
-            border-radius: 50px;
+        .time-unit {
+            margin: 0 15px;
             text-align: center;
-            font-family: 'Arial', sans-serif;
-            background: #FFFFFF;
-            color: #333333;
-            outline: none;
-            opacity: 0;
-            animation: fadeIn 1s ease-out 2s forwards;
-            box-sizing: border-box;
-            height: 60px;
-            margin: 0;
-            transition: all 0.3s ease;
         }
        
-        .wish-input:focus {
-            border-color: #8A2BE2;
+        .time-value {
+            font-size: 4rem;
+            line-height: 1;
+            text-shadow: 0 0 10px #0f0;
+            background-color: rgba(0, 20, 0, 0.5);
+            padding: 10px;
+            border: 1px solid #0a0;
+            min-width: 120px;
         }
        
-        .wish-input::placeholder {
-            color: #9370DB;
-            opacity: 0.8;
-            font-style: italic;
+        .time-label {
+            font-size: 1.2rem;
+            margin-top: 10px;
+            color: #0a0;
+            text-transform: uppercase;
         }
        
-        .send-button {
+        .separator {
+            font-size: 4rem;
+            line-height: 1;
+            align-self: center;
+            animation: blink 1.5s infinite;
+        }
+       
+        .progress-container {
+            width: 100%;
+            height: 20px;
+            background-color: #002200;
+            border: 1px solid #0a0;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+       
+        .progress-bar {
+            height: 100%;
+            background-color: #0f0;
+            width: 0%;
+            box-shadow: 0 0 10px #0f0;
+        }
+       
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 0.9rem;
+            color: #0a0;
+        }
+       
+        .status-line {
+            border-top: 1px solid #0a0;
+            padding-top: 10px;
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.1rem;
+        }
+       
+        .blink {
+            animation: blink 1s infinite;
+        }
+       
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+       
+        .flicker {
+            animation: flicker 0.1s infinite;
+        }
+       
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.95; }
+        }
+       
+        /* CRT curvature effect */
+        .crt-curve {
             position: absolute;
-            bottom: 18%;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 15px 50px;
-            font-size: 18px;
-            font-weight: bold;
-            background: #9370DB;
-            color: white;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            font-family: 'Arial', sans-serif;
-            opacity: 0;
-            animation: fadeIn 1s ease-out 2.5s forwards;
-            transition: all 0.3s ease;
-            box-sizing: border-box;
-        }
-       
-        .send-button:hover {
-            background: #8A2BE2;
-            transform: translateX(-50%) scale(1.05);
-        }
-       
-        .send-button:disabled {
-            cursor: not-allowed;
-            opacity: 0.5;
-            transform: translateX(-50%) scale(1);
-        }
-       
-        @keyframes fadeIn {
-            0% {
-                opacity: 0;
-            }
-            100% {
-                opacity: 1;
-            }
-        }
-       
-        @keyframes slideUp {
-            0% {
-                opacity: 0;
-                transform: translateX(-50%) translateY(50px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0);
-            }
-        }
-       
-        .confetti {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 10px;
+            box-shadow:
+                inset 0 0 60px rgba(0, 30, 0, 0.5),
+                inset 0 0 100px rgba(0, 20, 0, 0.3);
+            z-index: 4;
             pointer-events: none;
         }
        
-        .confetti:nth-child(odd) {
-            background: linear-gradient(45deg, #ff6b6b, #feca57);
+        /* Power light */
+        .power-light {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #0f0;
+            box-shadow: 0 0 10px #0f0;
+            animation: pulse 2s infinite;
         }
        
-        .confetti:nth-child(3n) {
-            background: linear-gradient(45deg, #48cae4, #06ffa5);
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
         }
        
-        .confetti:nth-child(4n) {
-            background: linear-gradient(45deg, #f38ba8, #a8dadc);
-        }
-       
-        .confetti:nth-child(5n) {
-            background: linear-gradient(45deg, #b19cd9, #ff9a9e);
-        }
-       
-        .confetti:nth-child(6n) {
-            background: linear-gradient(45deg, #ffd89b, #19547b);
-        }
-       
-        @keyframes confettiFall {
-            0% {
-                opacity: 1;
-                transform: translateY(-50px) rotate(0deg);
+        @media (max-width: 600px) {
+            .time-value {
+                font-size: 2.5rem;
+                min-width: 80px;
             }
-            100% {
-                opacity: 0;
-                transform: translateY(600px) rotate(720deg);
+           
+            .separator {
+                font-size: 2.5rem;
             }
-        }
-       
-        .fade-out {
-            animation: fadeOut 2s ease-out forwards;
-        }
-       
-        @keyframes fadeOut {
-            0% {
-                opacity: 1;
-                transform: scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: scale(0.8);
+           
+            .time-unit {
+                margin: 0 8px;
             }
         }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <svg width="500" height="700" viewBox="0 0 500 700">
-            <!-- Rose stem -->
-            <g class="stem">
-                <path d="M 311 641 C 288.909 641 256 572.014 256 490 C 256 407.986 245.909 326 268 326 C 290.091 326 288 385 285 476 C 282.298 557.97 333.091 641 311 641 Z"
-                      fill="url(#stemGradient)" stroke="none"/>
+    <div class="crt flicker">
+        <div class="crt-curve"></div>
+        <div class="screen">
+            <div class="header">
+                <div class="title">DEC VT-100 COUNTDOWN SYSTEM</div>
+                <div class="subtitle">TIME TO TARGET: 05 OCT 10:00 EDT</div>
+            </div>
+           
+            <div class="timer-display">
+                <div class="time-row">
+                    <div class="time-unit">
+                        <div class="time-value" id="days">00</div>
+                        <div class="time-label">DAYS</div>
+                    </div>
+                    <div class="separator">:</div>
+                    <div class="time-unit">
+                        <div class="time-value" id="hours">00</div>
+                        <div class="time-label">HOURS</div>
+                    </div>
+                </div>
                
-                <defs>
-                    <linearGradient id="stemGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" style="stop-color:#228B22;stop-opacity:1" />
-                        <stop offset="50%" style="stop-color:#32CD32;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#006400;stop-opacity:1" />
-                    </linearGradient>
-                    <linearGradient id="leafGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#90EE90;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#228B22;stop-opacity:1" />
-                    </linearGradient>
-                    <radialGradient id="petalGradient1" cx="50%" cy="30%" r="70%">
-                        <stop offset="0%" style="stop-color:#9370DB;stop-opacity:1" />
-                        <stop offset="50%" style="stop-color:#663399;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#483D8B;stop-opacity:1" />
-                    </radialGradient>
-                    <radialGradient id="petalGradient2" cx="50%" cy="30%" r="70%">
-                        <stop offset="0%" style="stop-color:#8A2BE2;stop-opacity:1" />
-                        <stop offset="50%" style="stop-color:#6A0DAD;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#4B0082;stop-opacity:1" />
-                    </radialGradient>
-                    <radialGradient id="petalGradient3" cx="50%" cy="30%" r="70%">
-                        <stop offset="0%" style="stop-color:#BA55D3;stop-opacity:1" />
-                        <stop offset="50%" style="stop-color:#9932CC;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#8B008B;stop-opacity:1" />
-                    </radialGradient>
-                    <radialGradient id="petalGradientRed1" cx="50%" cy="30%" r="70%">
-                        <stop offset="0%" style="stop-color:#CD5C5C;stop-opacity:1" />
-                        <stop offset="50%" style="stop-color:#DC143C;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#8B0000;stop-opacity:1" />
-                    </radialGradient>
-                    <radialGradient id="petalGradientRed2" cx="50%" cy="30%" r="70%">
-                        <stop offset="0%" style="stop-color:#B22222;stop-opacity:1" />
-                        <stop offset="50%" style="stop-color:#8B0000;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#660000;stop-opacity:1" />
-                    </radialGradient>
-                    <radialGradient id="petalGradientRed3" cx="50%" cy="30%" r="70%">
-                        <stop offset="0%" style="stop-color:#DC143C;stop-opacity:1" />
-                        <stop offset="50%" style="stop-color:#B22222;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#800000;stop-opacity:1" />
-                    </radialGradient>
-                </defs>
-            </g>
+                <div class="time-row">
+                    <div class="time-unit">
+                        <div class="time-value" id="minutes">00</div>
+                        <div class="time-label">MINUTES</div>
+                    </div>
+                    <div class="separator">:</div>
+                    <div class="time-unit">
+                        <div class="time-value" id="seconds">00</div>
+                        <div class="time-label">SECONDS</div>
+                    </div>
+                </div>
+            </div>
            
-            <!-- Rose leaves -->
-            <g class="leaf">
-                <path d="M 276.74 433.808 C 287.93 446.666 308.183 428.08 335.617 404.536 C 363.05 380.993 397.495 377.692 398.541 360.293 C 399.787 339.559 333.839 340.797 306.406 364.34 C 278.972 387.883 265.549 420.949 276.74 433.808 Z"
-                      fill="url(#leafGradient)"/>
-            </g>
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div class="progress-labels">
+                <div>00:00</div>
+                <div>SYSTEM PROGRESS</div>
+                <div>05 OCT</div>
+            </div>
            
-            <g class="leaf">
-                <path d="M 129.614 392.738 C 120.883 411.334 148.751 423.04 184.795 439.752 C 220.839 456.464 238.7 491.218 257.289 483.202 C 279.442 473.648 250.547 404.444 214.503 387.732 C 178.459 371.02 138.345 374.142 129.614 392.738 Z"
-                      fill="url(#leafGradient)"/>
-            </g>
+            <div class="status-line">
+                <div>SYSTEM: <span class="blink">READY</span></div>
+                <div>MEMORY: 64KB</div>
+                <div>CPU: Z80 @ 4MHz</div>
+            </div>
            
-            <!-- Rose petals (outer layer) -->
-            <g class="petal" data-id="1" data-layer="outer">
-                <path d="M 289.148 328.865 C 255.061 334.541 219.688 308.847 210.141 271.476 C 200.594 234.105 220.487 199.209 254.574 193.533 C 288.662 187.857 324.034 213.551 333.582 250.922 C 343.129 288.293 323.235 323.189 289.148 328.865 Z"
-                      fill="url(#petalGradient1)"/>
-            </g>
-           
-            <g class="petal" data-id="2" data-layer="outer">
-                <path d="M 269.65 313.588 C 249.132 321.57 215.987 304.065 195.617 274.49 C 175.248 244.914 175.368 214.467 195.886 206.485 C 216.403 198.503 249.549 216.008 269.918 245.584 C 290.287 275.16 290.167 305.606 269.65 313.588 Z"
-                      fill="url(#petalGradient1)"/>
-            </g>
-           
-            <g class="petal" data-id="3" data-layer="outer">
-                <path d="M 283.33 311.366 C 260.491 306.431 253.145 278.265 266.924 248.455 C 280.702 218.646 310.386 198.48 333.226 203.415 C 356.065 208.35 363.41 236.516 349.632 266.326 C 335.854 296.135 306.169 316.301 283.33 311.366 Z"
-                      fill="url(#petalGradient1)"/>
-            </g>
-           
-            <g class="petal" data-id="4" data-layer="outer">
-                <path d="M 174.434 287.429 C 150.048 262.651 143.634 235.881 160.108 227.638 C 176.582 219.394 209.706 232.798 234.092 257.577 C 258.478 282.355 264.892 309.125 248.418 317.368 C 231.944 325.612 198.82 312.208 174.434 287.429 Z"
-                      fill="url(#petalGradient1)"/>
-            </g>
-           
-            <g class="petal" data-id="5" data-layer="outer">
-                <path d="M 313.867 321.323 C 297.266 318.198 295.936 293.317 310.896 265.751 C 325.857 238.185 351.443 218.372 368.044 221.497 C 384.646 224.622 385.976 249.503 371.015 277.069 C 356.055 304.635 330.469 324.448 313.867 321.323 Z"
-                      fill="url(#petalGradient1)"/>
-            </g>
-           
-            <!-- Rose petals (middle layer) -->
-            <g class="petal" data-id="6" data-layer="middle">
-                <path d="M 268.317 311.184 C 242.017 308.653 220.97 281.939 221.308 251.517 C 221.646 221.095 243.24 198.485 269.54 201.016 C 295.84 203.548 316.886 230.261 316.548 260.683 C 316.211 291.105 294.617 313.715 268.317 311.184 Z"
-                      fill="url(#petalGradient2)"/>
-            </g>
-           
-            <g class="petal" data-id="7" data-layer="middle">
-                <path d="M 189.997 271.256 C 181.806 242.014 189.652 219.038 207.521 219.937 C 225.391 220.836 246.517 245.27 254.708 274.512 C 262.899 303.754 255.053 326.73 237.184 325.831 C 219.314 324.932 198.188 300.498 189.997 271.256 Z"
-                      fill="url(#petalGradient2)"/>
-            </g>
-           
-            <g class="petal" data-id="8" data-layer="middle">
-                <path d="M 302.773 329.648 C 285.882 329.366 280.378 305.066 290.478 275.373 C 300.579 245.679 322.46 221.837 339.35 222.12 C 356.241 222.402 361.746 246.702 351.645 276.395 C 341.545 306.089 319.664 329.931 302.773 329.648 Z"
-                      fill="url(#petalGradient2)"/>
-            </g>
-           
-            <!-- Rose petals (inner layer) -->
-            <g class="petal" data-id="9" data-layer="inner">
-                <path d="M 266.756 312.779 C 245.769 310.691 228.974 288.65 229.244 263.549 C 229.513 238.449 246.745 219.794 267.732 221.882 C 288.718 223.971 305.513 246.012 305.243 271.112 C 304.974 296.213 287.742 314.868 266.756 312.779 Z"
-                      fill="url(#petalGradient3)"/>
-            </g>
-           
-            <g class="petal" data-id="10" data-layer="inner">
-                <path d="M 204.258 279.836 C 197.722 255.709 203.983 236.751 218.242 237.493 C 232.502 238.235 249.36 258.395 255.896 282.522 C 262.433 306.649 256.172 325.606 241.912 324.864 C 227.652 324.122 210.794 303.962 204.258 279.836 Z"
-                      fill="url(#petalGradient3)"/>
-            </g>
-           
-            <g class="petal" data-id="11" data-layer="inner">
-                <path d="M 294.251 328.013 C 280.773 327.78 276.38 307.731 284.44 283.232 C 292.5 258.733 309.96 239.061 323.439 239.294 C 336.917 239.527 341.31 259.577 333.25 284.076 C 325.19 308.575 307.73 328.247 294.251 328.013 Z"
-                      fill="url(#petalGradient3)"/>
-            </g>
-           
-            <!-- Center petals -->
-            <g class="petal" data-id="12" data-layer="center">
-                <path d="M 261.92 339.672 C 243.535 351.774 207.873 342.008 182.268 317.86 C 156.662 293.712 150.808 264.326 169.194 252.224 C 187.579 240.123 223.241 249.888 248.847 274.036 C 274.452 298.184 280.306 327.57 261.92 339.672 Z"
-                      fill="url(#petalGradient2)"/>
-            </g>
-           
-            <g class="petal" data-id="13" data-layer="center">
-                <path d="M 283.198 331.665 C 264.349 320.436 266.9 292.446 288.896 269.147 C 310.892 245.849 344.004 236.064 362.853 247.294 C 381.702 258.523 379.151 286.513 357.155 309.812 C 335.159 333.11 302.047 342.894 283.198 331.665 Z"
-                      fill="url(#petalGradient2)"/>
-            </g>
-           
-            <g class="petal" data-id="14" data-layer="center">
-                <path d="M 270.741 349.281 C 237.931 351.551 209.923 333.015 208.184 307.879 C 206.444 282.744 231.632 260.527 264.442 258.256 C 297.253 255.986 325.26 274.522 327 299.658 C 328.739 324.793 303.551 347.01 270.741 349.281 Z"
-                      fill="url(#petalGradient2)"/>
-            </g>
-        </svg>
+            <div class="power-light"></div>
+        </div>
     </div>
 
     <script>
-        const petals = document.querySelectorAll('.petal');
-        const container = document.querySelector('.container');
-        const fallAnimations = ['fall-straight', 'fall-spiral', 'fall-drift', 'fall-flutter', 'fall-tumble'];
-        let remainingPetals = petals.length;
-        let wishMade = false;
+        // Set the target date (Friday, October 5th, 10:00 AM Florida time - Eastern Time)
+        const now = new Date();
+        const currentYear = now.getFullYear();
        
-        petals.forEach(petal => {
-            petal.addEventListener('click', function(e) {
-                if (this.classList.contains('falling')) return;
-               
-                // Create sparkle effect at click point
-                createSparkles(e.clientX, e.clientY);
-               
-                // Add falling animation with random pattern
-                this.classList.add('falling');
-                const randomAnimation = fallAnimations[Math.floor(Math.random() * fallAnimations.length)];
-                this.classList.add(randomAnimation);
-               
-                // Create trailing particles
-                createPetalTrail(this);
-               
-                // Decrease remaining petals count
-                remainingPetals--;
-               
-                // Remove after animation
-                setTimeout(() => {
-                    this.remove();
-                   
-                    // Check if this was the last petal
-                    if (remainingPetals === 0) {
-                        showBirthdayMessage();
-                    }
-                }, 5000);
-            });
-        });
+        // Create target date for October 5th, 10:00 AM Eastern Time
+        const targetDate = new Date(currentYear, 9, 5, 10, 0, 0); // Months are 0-indexed (9 = October)
        
-        function showBirthdayMessage() {
-            // Fade out the entire rose (stem and leaves)
-            const svg = document.querySelector('svg');
-            svg.classList.add('fade-out');
+        // If the date has already passed this year, set it for next year
+        if (now > targetDate) {
+            targetDate.setFullYear(currentYear + 1);
+        }
+       
+        // Update the countdown every second
+        const countdown = setInterval(function() {
+            const now = new Date().getTime();
+            const distance = targetDate.getTime() - now;
            
-            // Create confetti explosion
-            createConfetti();
+            // If the countdown is over
+            if (distance < 0) {
+                clearInterval(countdown);
+                document.getElementById("days").innerHTML = "00";
+                document.getElementById("hours").innerHTML = "00";
+                document.getElementById("minutes").innerHTML = "00";
+                document.getElementById("seconds").innerHTML = "00";
+                document.querySelector(".header .subtitle").innerHTML = "TARGET TIME REACHED";
+                document.querySelector(".status-line div:first-child").innerHTML = "SYSTEM: <span class='blink'>COMPLETE</span>";
+                document.getElementById("progress-bar").style.width = "100%";
+                return;
+            }
            
-            // Show birthday message after a short delay
-            setTimeout(() => {
-                const message = document.createElement('div');
-                message.className = 'birthday-message';
-                message.innerHTML = 'Happy Birthday!';
-                container.appendChild(message);
-               
-                // Add wish input field and send button after another delay
-                setTimeout(() => {
-                    const wishInput = document.createElement('input');
-                    wishInput.type = 'text';
-                    wishInput.className = 'wish-input';
-                    wishInput.placeholder = 'Make a wish...';
-                    wishInput.maxLength = 50;
-                    container.appendChild(wishInput);
-                   
-                    const sendButton = document.createElement('button');
-                    sendButton.className = 'send-button';
-                    sendButton.innerHTML = 'WISH';
-                    sendButton.onclick = function() {
-                        if (wishMade) {
-                            alert('You can only make one wish!');
-                            return;
-                        }
-                       
-                        if (wishInput.value.trim()) {
-                            wishMade = true;
-                            sendButton.disabled = true;
-                            sendButton.innerHTML = 'SENT';
-                            wishInput.disabled = true;
-                            alert('Your wish: "' + wishInput.value + '" has been sent to the universe! ✨');
-                        } else {
-                            alert('Please make a wish first!');
-                        }
-                    };
-                    container.appendChild(sendButton);
-                }, 500);
-            }, 1000);
-        }
-       
-        function createConfetti() {
-            for (let i = 0; i < 50; i++) {
-                setTimeout(() => {
-                    const confetti = document.createElement('div');
-                    confetti.className = 'confetti';
-                    confetti.style.left = Math.random() * 100 + '%';
-                    confetti.style.top = '-20px';
-                    confetti.style.animation = `confettiFall ${2 + Math.random() * 3}s ease-out forwards`;
-                    confetti.style.animationDelay = Math.random() * 2 + 's';
-                    document.body.appendChild(confetti);
-                   
-                    setTimeout(() => confetti.remove(), 5000);
-                }, i * 50);
-            }
-        }
-       
-        function createSparkles(x, y) {
-            for (let i = 0; i < 8; i++) {
-                const sparkle = document.createElement('div');
-                sparkle.className = 'sparkle';
-                sparkle.style.left = (x - 2) + 'px';
-                sparkle.style.top = (y - 2) + 'px';
-                sparkle.style.animationDelay = (i * 0.1) + 's';
-                document.body.appendChild(sparkle);
-               
-                setTimeout(() => sparkle.remove(), 1500);
-            }
-        }
-       
-        function createPetalTrail(petalElement) {
-            const rect = petalElement.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
+            // Calculate time units
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
            
-            for (let i = 0; i < 5; i++) {
-                setTimeout(() => {
-                    const trail = document.createElement('div');
-                    trail.className = 'petal-trail';
-                    trail.style.left = (centerX + Math.random() * 20 - 10) + 'px';
-                    trail.style.top = (centerY + i * 100) + 'px';
-                    document.body.appendChild(trail);
-                   
-                    setTimeout(() => trail.remove(), 2000);
-                }, i * 500);
-            }
-        }
+            // Display the results
+            document.getElementById("days").innerHTML = days.toString().padStart(2, '0');
+            document.getElementById("hours").innerHTML = hours.toString().padStart(2, '0');
+            document.getElementById("minutes").innerHTML = minutes.toString().padStart(2, '0');
+            document.getElementById("seconds").innerHTML = seconds.toString().padStart(2, '0');
+           
+            // Calculate progress percentage (for a 7-day period)
+            const totalTime = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+            const timePassed = totalTime - distance;
+            const progressPercentage = Math.min(100, (timePassed / totalTime) * 100);
+            document.getElementById("progress-bar").style.width = progressPercentage + "%";
+        }, 1000);
        
-        // Gentle breathing animation for remaining petals
+        // Add random flicker for authenticity
         setInterval(() => {
-            petals.forEach(petal => {
-                if (!petal.classList.contains('falling')) {
-                    const randomScale = 0.98 + (Math.random() * 0.04);
-                    const randomRotation = (Math.random() - 0.5) * 2;
-                    petal.style.transform = `scale(${randomScale}) rotate(${randomRotation}deg)`;
-                }
-            });
-        }, 3000);
+            const flicker = document.querySelector('.flicker');
+            if (Math.random() > 0.95) {
+                flicker.style.opacity = Math.random() * 0.2 + 0.8;
+            }
+        }, 100);
     </script>
 </body>
 </html>
