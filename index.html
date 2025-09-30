@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DEC VT-320 Multi-Function Terminal</title>
+    <title>VT-100 Countdown Timer</title>
     <style>
         * {
             margin: 0;
@@ -12,7 +12,7 @@
         }
         
         body {
-            background: #000;
+            background-color: #000;
             color: #0f0;
             font-family: 'VT323', monospace;
             min-height: 100vh;
@@ -21,32 +21,20 @@
             align-items: center;
             padding: 20px;
             overflow: hidden;
-            background: radial-gradient(circle, #001100 0%, #000 70%);
-        }
-        
-        .crt-container {
-            perspective: 800px;
         }
         
         .crt {
-            background: 
-                linear-gradient(to bottom, #111 0%, #000 20%, #000 80%, #111 100%),
-                radial-gradient(circle at 50% 50%, #001a00 0%, #000 70%);
-            border: 25px solid #222;
-            border-top: 40px solid #222;
-            border-bottom: 50px solid #222;
-            border-radius: 15px;
-            width: 950px;
-            height: 750px;
+            background-color: #001100;
+            border: 15px solid #333;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 700px;
+            height: 500px;
             position: relative;
-            box-shadow: 
-                0 0 80px rgba(0, 30, 0, 0.7),
-                inset 0 0 100px rgba(0, 20, 0, 0.5);
-            transform: rotateX(5deg);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
             overflow: hidden;
         }
         
-        /* CRT screen effects */
         .crt::before {
             content: "";
             position: absolute;
@@ -55,8 +43,8 @@
             right: 0;
             bottom: 0;
             background: 
-                linear-gradient(rgba(0, 40, 0, 0.1) 50%, rgba(0, 0, 0, 0.1) 50%),
-                radial-gradient(circle at 50% 50%, rgba(0, 60, 0, 0.1), rgba(0, 0, 0, 0.3));
+                linear-gradient(rgba(0, 30, 0, 0.1) 50%, rgba(0, 0, 0, 0.1) 50%),
+                radial-gradient(circle at 50% 50%, rgba(0, 50, 0, 0.1), rgba(0, 0, 0, 0.3));
             background-size: 100% 4px, 100% 100%;
             z-index: 2;
             pointer-events: none;
@@ -69,121 +57,52 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: 
-                radial-gradient(ellipse at 50% 50%, transparent 30%, rgba(0, 20, 0, 0.7) 100%),
-                radial-gradient(circle at 20% 80%, rgba(0, 30, 0, 0.3), transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(0, 30, 0, 0.3), transparent 50%);
+            background: radial-gradient(circle at 50% 50%, transparent 70%, rgba(0, 20, 0, 0.7));
             z-index: 3;
             pointer-events: none;
         }
         
         .screen {
-            padding: 20px;
+            padding: 30px;
             height: 100%;
             display: flex;
             flex-direction: column;
             position: relative;
             z-index: 1;
-            text-shadow: 0 0 5px #0f0;
-            animation: flicker 0.15s infinite;
         }
         
-        .boot-sequence {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: #000;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 30px;
-        }
-        
-        .boot-line {
-            margin: 5px 0;
-            opacity: 0;
-            animation: typewriter 0.5s forwards;
-        }
-        
-        .boot-line:nth-child(2) { animation-delay: 0.5s; }
-        .boot-line:nth-child(3) { animation-delay: 1s; }
-        .boot-line:nth-child(4) { animation-delay: 1.5s; }
-        .boot-line:nth-child(5) { animation-delay: 2s; }
-        .boot-line:nth-child(6) { animation-delay: 2.5s; }
-        .boot-line:nth-child(7) { animation-delay: 3s; }
-        .boot-line:nth-child(8) { animation-delay: 3.5s; }
-        .boot-line:nth-child(9) { animation-delay: 4s; }
-        
-        .main-interface {
-            display: none;
-            height: 100%;
-            flex-direction: column;
-        }
-        
-        .menu-bar {
-            display: flex;
-            justify-content: space-between;
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
             border-bottom: 1px solid #0a0;
-            padding-bottom: 5px;
-            margin-bottom: 10px;
+            padding-bottom: 10px;
         }
         
-        .menu-title {
-            font-size: 1.2rem;
-            font-weight: bold;
+        .title {
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
         
-        .menu-options {
-            display: flex;
-            gap: 15px;
-        }
-        
-        .menu-option {
-            cursor: pointer;
-            padding: 2px 5px;
-        }
-        
-        .menu-option:hover, .menu-option.active {
-            background: #0a0;
-            color: #000;
-        }
-        
-        .content-area {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        
-        .app-window {
-            flex-grow: 1;
-            border: 1px solid #0a0;
-            padding: 10px;
-            display: none;
-            flex-direction: column;
-            overflow: auto;
-        }
-        
-        .app-title {
-            border-bottom: 1px solid #0a0;
-            padding-bottom: 5px;
-            margin-bottom: 10px;
-            font-size: 1.2rem;
+        .subtitle {
+            font-size: 1rem;
+            color: #0a0;
+            margin-top: 5px;
         }
         
         .timer-display {
             text-align: center;
-            margin: 20px 0;
+            margin: 40px 0;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         
         .time-row {
             display: flex;
             justify-content: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         
         .time-unit {
@@ -192,14 +111,13 @@
         }
         
         .time-value {
-            font-size: 3rem;
+            font-size: 4rem;
             line-height: 1;
-            text-shadow: 0 0 15px #0f0;
-            background: rgba(0, 30, 0, 0.3);
+            text-shadow: 0 0 10px #0f0;
+            background-color: rgba(0, 20, 0, 0.5);
             padding: 10px;
-            border: 2px solid #0a0;
+            border: 1px solid #0a0;
             min-width: 120px;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
         }
         
         .time-label {
@@ -207,264 +125,47 @@
             margin-top: 10px;
             color: #0a0;
             text-transform: uppercase;
-            letter-spacing: 2px;
         }
         
         .separator {
-            font-size: 3rem;
+            font-size: 4rem;
             line-height: 1;
             align-self: center;
             animation: blink 1.5s infinite;
-            text-shadow: 0 0 10px #0f0;
         }
         
         .progress-container {
             width: 100%;
             height: 20px;
-            background: #002200;
+            background-color: #002200;
             border: 1px solid #0a0;
-            margin: 20px 0 10px;
+            margin: 20px 0;
             position: relative;
             overflow: hidden;
         }
         
         .progress-bar {
             height: 100%;
-            background: linear-gradient(to right, #0a0, #0f0, #0a0);
+            background-color: #0f0;
             width: 0%;
-            box-shadow: 0 0 15px #0f0;
-            transition: width 0.5s ease;
+            box-shadow: 0 0 10px #0f0;
         }
         
-        .terminal {
-            flex-grow: 1;
-            background: #000;
-            border: 1px solid #0a0;
-            padding: 10px;
-            font-family: 'VT323', monospace;
-            color: #0f0;
-            overflow-y: auto;
-            height: 300px;
-        }
-        
-        .terminal-line {
-            margin-bottom: 5px;
-            white-space: pre-wrap;
-        }
-        
-        .prompt {
-            color: #0f0;
-        }
-        
-        .input-line {
-            display: flex;
-            margin-top: 5px;
-        }
-        
-        .input-line input {
-            flex-grow: 1;
-            background: transparent;
-            border: none;
-            color: #0f0;
-            font-family: 'VT323', monospace;
-            font-size: 1rem;
-            outline: none;
-        }
-        
-        .game-area {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            flex-grow: 1;
-        }
-        
-        .game-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-gap: 5px;
-            margin: 20px 0;
-        }
-        
-        .game-cell {
-            width: 80px;
-            height: 80px;
-            background: #002200;
-            border: 1px solid #0a0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            cursor: pointer;
-        }
-        
-        .game-cell:hover {
-            background: #003300;
-        }
-        
-        .game-status {
-            margin: 10px 0;
-            font-size: 1.2rem;
-        }
-        
-        .calculator {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-gap: 5px;
-            max-width: 300px;
-            margin: 20px auto;
-        }
-        
-        .calc-display {
-            grid-column: 1 / span 4;
-            background: #002200;
-            border: 1px solid #0a0;
-            padding: 10px;
-            text-align: right;
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-            height: 50px;
-            overflow: hidden;
-        }
-        
-        .calc-btn {
-            background: #002200;
-            border: 1px solid #0a0;
-            color: #0f0;
-            padding: 15px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            font-family: 'VT323', monospace;
-        }
-        
-        .calc-btn:hover {
-            background: #003300;
-        }
-        
-        .calc-btn.operator {
-            background: #004400;
-        }
-        
-        .file-manager {
-            display: flex;
-            height: 100%;
-        }
-        
-        .file-list {
-            flex: 1;
-            border-right: 1px solid #0a0;
-            padding-right: 10px;
-            overflow-y: auto;
-        }
-        
-        .file-content {
-            flex: 2;
-            padding-left: 10px;
-            overflow-y: auto;
-        }
-        
-        .file-item {
-            padding: 5px;
-            cursor: pointer;
-            border-bottom: 1px solid #033;
-        }
-        
-        .file-item:hover {
-            background: #003300;
-        }
-        
-        .text-editor {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .editor-toolbar {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        
-        .editor-toolbar button {
-            background: #002200;
-            border: 1px solid #0a0;
-            color: #0f0;
-            padding: 5px 10px;
-            cursor: pointer;
-            font-family: 'VT323', monospace;
-        }
-        
-        .editor-area {
-            flex-grow: 1;
-            background: #001100;
-            border: 1px solid #0a0;
-            padding: 10px;
-            font-family: 'VT323', monospace;
-            color: #0f0;
-            resize: none;
-            outline: none;
-        }
-        
-        .memory-game {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .memory-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-gap: 5px;
-            margin: 20px 0;
-        }
-        
-        .memory-card {
-            width: 70px;
-            height: 70px;
-            background: #002200;
-            border: 1px solid #0a0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            cursor: pointer;
-            perspective: 1000px;
-        }
-        
-        .memory-card .front, .memory-card .back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .memory-card .front {
-            background: #002200;
-        }
-        
-        .memory-card .back {
-            background: #004400;
-            transform: rotateY(180deg);
-        }
-        
-        .memory-card.flipped .front {
-            transform: rotateY(180deg);
-        }
-        
-        .memory-card.flipped .back {
-            transform: rotateY(0);
-        }
-        
-        .status-bar {
-            border-top: 1px solid #0a0;
-            padding-top: 5px;
-            margin-top: 10px;
+        .progress-labels {
             display: flex;
             justify-content: space-between;
+            margin-top: 5px;
             font-size: 0.9rem;
+            color: #0a0;
+        }
+        
+        .status-line {
+            border-top: 1px solid #0a0;
+            padding-top: 10px;
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.1rem;
         }
         
         .blink {
@@ -476,14 +177,13 @@
             50% { opacity: 0.3; }
         }
         
-        @keyframes flicker {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.98; }
+        .flicker {
+            animation: flicker 0.1s infinite;
         }
         
-        @keyframes typewriter {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.95; }
         }
         
         /* CRT curvature effect */
@@ -493,351 +193,104 @@
             left: 0;
             right: 0;
             bottom: 0;
-            border-radius: 5px;
+            border-radius: 10px;
             box-shadow: 
-                inset 0 0 80px rgba(0, 40, 0, 0.6),
-                inset 0 0 200px rgba(0, 20, 0, 0.4);
+                inset 0 0 60px rgba(0, 30, 0, 0.5),
+                inset 0 0 100px rgba(0, 20, 0, 0.3);
             z-index: 4;
             pointer-events: none;
         }
         
-        /* Power light and controls */
+        /* Power light */
         .power-light {
             position: absolute;
             bottom: 15px;
             right: 15px;
-            width: 15px;
-            height: 15px;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
-            background: #0f0;
-            box-shadow: 0 0 15px #0f0;
+            background-color: #0f0;
+            box-shadow: 0 0 10px #0f0;
             animation: pulse 2s infinite;
         }
         
-        .controls {
-            position: absolute;
-            bottom: 10px;
-            left: 20px;
-            display: flex;
-            gap: 10px;
-        }
-        
-        .control-knob {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: #333;
-            border: 2px solid #555;
-            box-shadow: 0 0 5px #000;
-        }
-        
-        .brand {
-            position: absolute;
-            bottom: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 1.2rem;
-            color: #666;
-            letter-spacing: 2px;
-        }
-        
         @keyframes pulse {
-            0%, 100% { opacity: 0.7; box-shadow: 0 0 10px #0f0; }
-            50% { opacity: 1; box-shadow: 0 0 20px #0f0; }
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
         }
         
-        @media (max-width: 1000px) {
-            .crt {
-                width: 95vw;
-                height: 80vh;
-            }
-            
+        @media (max-width: 600px) {
             .time-value {
-                font-size: 2rem;
+                font-size: 2.5rem;
                 min-width: 80px;
             }
             
             .separator {
-                font-size: 2rem;
+                font-size: 2.5rem;
             }
             
             .time-unit {
-                margin: 0 10px;
+                margin: 0 8px;
             }
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="crt-container">
-        <div class="crt">
-            <div class="crt-curve"></div>
-            <div class="boot-sequence" id="boot-sequence">
-                <div class="boot-line">DIGITAL EQUIPMENT CORPORATION VT-320</div>
-                <div class="boot-line">ROM Version 3.2</div>
-                <div class="boot-line">128KB RAM INSTALLED</div>
-                <div class="boot-line">INITIALIZING MULTI-TASKING SYSTEM...</div>
-                <div class="boot-line">LOADING COUNTDOWN MODULE...</div>
-                <div class="boot-line">LOADING TERMINAL EMULATOR...</div>
-                <div class="boot-line">LOADING GAME SYSTEM...</div>
-                <div class="boot-line">LOADING FILE MANAGER...</div>
-                <div class="boot-line">SYSTEM READY</div>
-                <div class="boot-line blink">PRESS ANY KEY TO CONTINUE</div>
+    <div class="crt flicker">
+        <div class="crt-curve"></div>
+        <div class="screen">
+            <div class="header">
+                <div class="title">DEC VT-100 COUNTDOWN SYSTEM</div>
+                <div class="subtitle">TIME TO TARGET: 05 OCT 10:00 EDT</div>
             </div>
             
-            <div class="main-interface" id="main-interface">
-                <div class="screen">
-                    <div class="menu-bar">
-                        <div class="menu-title">DEC VT-320 MULTI-FUNCTION TERMINAL</div>
-                        <div class="menu-options">
-                            <div class="menu-option active" onclick="showApp('timer')">TIMER</div>
-                            <div class="menu-option" onclick="showApp('terminal')">TERMINAL</div>
-                            <div class="menu-option" onclick="showApp('tictactoe')">TIC-TAC-TOE</div>
-                            <div class="menu-option" onclick="showApp('calculator')">CALCULATOR</div>
-                            <div class="menu-option" onclick="showApp('memory')">MEMORY GAME</div>
-                            <div class="menu-option" onclick="showApp('editor')">TEXT EDITOR</div>
-                            <div class="menu-option" onclick="showApp('files')">FILES</div>
-                            <div class="menu-option" onclick="showApp('info')">SYSTEM INFO</div>
-                        </div>
+            <div class="timer-display">
+                <div class="time-row">
+                    <div class="time-unit">
+                        <div class="time-value" id="days">00</div>
+                        <div class="time-label">DAYS</div>
                     </div>
-                    
-                    <div class="content-area">
-                        <!-- Timer App -->
-                        <div class="app-window" id="timer">
-                            <div class="app-title">COUNTDOWN SYSTEM - TARGET: 05 OCT 10:00 EDT</div>
-                            <div class="timer-display">
-                                <div class="time-row">
-                                    <div class="time-unit">
-                                        <div class="time-value" id="days">00</div>
-                                        <div class="time-label">DAYS</div>
-                                    </div>
-                                    <div class="separator">:</div>
-                                    <div class="time-unit">
-                                        <div class="time-value" id="hours">00</div>
-                                        <div class="time-label">HOURS</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="time-row">
-                                    <div class="time-unit">
-                                        <div class="time-value" id="minutes">00</div>
-                                        <div class="time-label">MINUTES</div>
-                                    </div>
-                                    <div class="separator">:</div>
-                                    <div class="time-unit">
-                                        <div class="time-value" id="seconds">00</div>
-                                        <div class="time-label">SECONDS</div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="progress-container">
-                                <div class="progress-bar" id="progress-bar"></div>
-                            </div>
-                            
-                            <div class="status-bar">
-                                <div>STATUS: <span class="blink" id="status">COUNTING</span></div>
-                                <div>SYSTEM TIME: <span id="clock">--:--:--</span></div>
-                                <div>MEMORY: 128KB</div>
-                            </div>
-                        </div>
-                        
-                        <!-- Terminal App -->
-                        <div class="app-window" id="terminal">
-                            <div class="app-title">TERMINAL EMULATOR - VT-320 MODE</div>
-                            <div class="terminal" id="terminal-output">
-                                <div class="terminal-line">DEC VT-320 Terminal Emulator v1.0</div>
-                                <div class="terminal-line">Type 'help' for available commands</div>
-                                <div class="terminal-line"></div>
-                                <div class="terminal-line prompt">user@vt320:~$ </div>
-                            </div>
-                            <div class="input-line">
-                                <span class="prompt">user@vt320:~$ </span>
-                                <input type="text" id="terminal-input" autocomplete="off">
-                            </div>
-                        </div>
-                        
-                        <!-- Tic-Tac-Toe App -->
-                        <div class="app-window" id="tictactoe">
-                            <div class="app-title">TIC-TAC-TOE GAME</div>
-                            <div class="game-area">
-                                <div class="game-status" id="game-status">Your turn (X)</div>
-                                <div class="game-grid" id="game-grid">
-                                    <div class="game-cell" data-cell="0"></div>
-                                    <div class="game-cell" data-cell="1"></div>
-                                    <div class="game-cell" data-cell="2"></div>
-                                    <div class="game-cell" data-cell="3"></div>
-                                    <div class="game-cell" data-cell="4"></div>
-                                    <div class="game-cell" data-cell="5"></div>
-                                    <div class="game-cell" data-cell="6"></div>
-                                    <div class="game-cell" data-cell="7"></div>
-                                    <div class="game-cell" data-cell="8"></div>
-                                </div>
-                                <button onclick="resetGame()" style="background:#002200;border:1px solid #0a0;color:#0f0;padding:5px 10px;cursor:pointer;font-family:'VT323'">New Game</button>
-                            </div>
-                        </div>
-                        
-                        <!-- Calculator App -->
-                        <div class="app-window" id="calculator">
-                            <div class="app-title">SCIENTIFIC CALCULATOR</div>
-                            <div class="calculator">
-                                <div class="calc-display" id="calc-display">0</div>
-                                <button class="calc-btn" onclick="clearCalc()">C</button>
-                                <button class="calc-btn" onclick="backspaceCalc()">⌫</button>
-                                <button class="calc-btn operator" onclick="appendToCalc('/')">/</button>
-                                <button class="calc-btn operator" onclick="appendToCalc('*')">×</button>
-                                <button class="calc-btn" onclick="appendToCalc('7')">7</button>
-                                <button class="calc-btn" onclick="appendToCalc('8')">8</button>
-                                <button class="calc-btn" onclick="appendToCalc('9')">9</button>
-                                <button class="calc-btn operator" onclick="appendToCalc('-')">-</button>
-                                <button class="calc-btn" onclick="appendToCalc('4')">4</button>
-                                <button class="calc-btn" onclick="appendToCalc('5')">5</button>
-                                <button class="calc-btn" onclick="appendToCalc('6')">6</button>
-                                <button class="calc-btn operator" onclick="appendToCalc('+')">+</button>
-                                <button class="calc-btn" onclick="appendToCalc('1')">1</button>
-                                <button class="calc-btn" onclick="appendToCalc('2')">2</button>
-                                <button class="calc-btn" onclick="appendToCalc('3')">3</button>
-                                <button class="calc-btn operator" onclick="calculateResult()" style="grid-row: span 2">=</button>
-                                <button class="calc-btn" onclick="appendToCalc('0')" style="grid-column: span 2">0</button>
-                                <button class="calc-btn" onclick="appendToCalc('.')">.</button>
-                            </div>
-                        </div>
-                        
-                        <!-- Memory Game App -->
-                        <div class="app-window" id="memory">
-                            <div class="app-title">MEMORY CARD GAME</div>
-                            <div class="memory-game">
-                                <div class="game-status" id="memory-status">Find all matching pairs!</div>
-                                <div class="memory-grid" id="memory-grid"></div>
-                                <button onclick="resetMemoryGame()" style="background:#002200;border:1px solid #0a0;color:#0f0;padding:5px 10px;cursor:pointer;font-family:'VT323'">New Game</button>
-                            </div>
-                        </div>
-                        
-                        <!-- Text Editor App -->
-                        <div class="app-window" id="editor">
-                            <div class="app-title">TEXT EDITOR</div>
-                            <div class="text-editor">
-                                <div class="editor-toolbar">
-                                    <button onclick="newDocument()">New</button>
-                                    <button onclick="saveDocument()">Save</button>
-                                    <button onclick="loadDocument()">Load</button>
-                                </div>
-                                <textarea class="editor-area" id="editor-area" placeholder="Start typing..."></textarea>
-                            </div>
-                        </div>
-                        
-                        <!-- File Manager App -->
-                        <div class="app-window" id="files">
-                            <div class="app-title">FILE MANAGER</div>
-                            <div class="file-manager">
-                                <div class="file-list">
-                                    <div class="file-item" onclick="viewFile('readme.txt')">readme.txt</div>
-                                    <div class="file-item" onclick="viewFile('system.log')">system.log</div>
-                                    <div class="file-item" onclick="viewFile('todo.txt')">todo.txt</div>
-                                    <div class="file-item" onclick="viewFile('notes.txt')">notes.txt</div>
-                                </div>
-                                <div class="file-content">
-                                    <div class="terminal" id="file-content">
-                                        Select a file to view its contents
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- System Info App -->
-                        <div class="app-window" id="info">
-                            <div class="app-title">SYSTEM INFORMATION</div>
-                            <div class="terminal">
-                                <div class="terminal-line">DEC VT-320 Multi-Function Terminal</div>
-                                <div class="terminal-line">System Version: 3.2</div>
-                                <div class="terminal-line">Memory: 128KB RAM</div>
-                                <div class="terminal-line">Processor: Z80 @ 4MHz</div>
-                                <div class="terminal-line">Display: 80x24 Monochrome</div>
-                                <div class="terminal-line">Boot ROM: 16KB</div>
-                                <div class="terminal-line">Serial Port: RS-232 @ 9600 baud</div>
-                                <div class="terminal-line"></div>
-                                <div class="terminal-line">Available Applications:</div>
-                                <div class="terminal-line">- Countdown Timer</div>
-                                <div class="terminal-line">- Terminal Emulator</div>
-                                <div class="terminal-line">- Tic-Tac-Toe Game</div>
-                                <div class="terminal-line">- Memory Card Game</div>
-                                <div class="terminal-line">- Scientific Calculator</div>
-                                <div class="terminal-line">- Text Editor</div>
-                                <div class="terminal-line">- File Manager</div>
-                                <div class="terminal-line"></div>
-                                <div class="terminal-line">System Uptime: <span id="uptime">00:00:00</span></div>
-                            </div>
-                        </div>
+                    <div class="separator">:</div>
+                    <div class="time-unit">
+                        <div class="time-value" id="hours">00</div>
+                        <div class="time-label">HOURS</div>
                     </div>
-                    
-                    <div class="controls">
-                        <div class="control-knob"></div>
-                        <div class="control-knob"></div>
-                        <div class="control-knob"></div>
+                </div>
+                
+                <div class="time-row">
+                    <div class="time-unit">
+                        <div class="time-value" id="minutes">00</div>
+                        <div class="time-label">MINUTES</div>
                     </div>
-                    
-                    <div class="brand">DIGITAL VT-320</div>
-                    <div class="power-light"></div>
+                    <div class="separator">:</div>
+                    <div class="time-unit">
+                        <div class="time-value" id="seconds">00</div>
+                        <div class="time-label">SECONDS</div>
+                    </div>
                 </div>
             </div>
+            
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div class="progress-labels">
+                <div>00:00</div>
+                <div>SYSTEM PROGRESS</div>
+                <div>05 OCT</div>
+            </div>
+            
+            <div class="status-line">
+                <div>SYSTEM: <span class="blink">READY</span></div>
+                <div>MEMORY: 64KB</div>
+                <div>CPU: Z80 @ 4MHz</div>
+            </div>
+            
+            <div class="power-light"></div>
         </div>
     </div>
 
     <script>
-        // Boot sequence
-        document.addEventListener('keydown', function() {
-            const bootSequence = document.getElementById('boot-sequence');
-            const mainInterface = document.getElementById('main-interface');
-            
-            if (bootSequence.style.display !== 'none') {
-                bootSequence.style.display = 'none';
-                mainInterface.style.display = 'flex';
-                showApp('timer');
-            }
-        });
-        
-        document.addEventListener('click', function() {
-            const bootSequence = document.getElementById('boot-sequence');
-            const mainInterface = document.getElementById('main-interface');
-            
-            if (bootSequence.style.display !== 'none') {
-                bootSequence.style.display = 'none';
-                mainInterface.style.display = 'flex';
-                showApp('timer');
-            }
-        });
-        
-        // App navigation
-        function showApp(appId) {
-            // Hide all apps
-            const apps = document.querySelectorAll('.app-window');
-            apps.forEach(app => {
-                app.style.display = 'none';
-            });
-            
-            // Remove active class from all menu options
-            const menuOptions = document.querySelectorAll('.menu-option');
-            menuOptions.forEach(option => {
-                option.classList.remove('active');
-            });
-            
-            // Show selected app and set active menu
-            document.getElementById(appId).style.display = 'flex';
-            event.target.classList.add('active');
-            
-            // Focus on appropriate input if needed
-            if (appId === 'terminal') {
-                document.getElementById('terminal-input').focus();
-            } else if (appId === 'editor') {
-                document.getElementById('editor-area').focus();
-            }
-            
-            // Initialize memory game if needed
-            if (appId === 'memory' && document.getElementById('memory-grid').children.length === 0) {
-                initializeMemoryGame();
-            }
-        }
-        
         // Set the target date (Friday, October 5th, 10:00 AM Florida time - Eastern Time)
         const now = new Date();
         const currentYear = now.getFullYear();
@@ -849,23 +302,6 @@
         if (now > targetDate) {
             targetDate.setFullYear(currentYear + 1);
         }
-        
-        // Update system clock and uptime
-        const startTime = new Date();
-        
-        function updateClock() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('en-US', {hour12: false});
-            document.getElementById('clock').textContent = timeString;
-            
-            // Update uptime
-            const uptime = new Date(now - startTime);
-            const uptimeString = uptime.toISOString().substr(11, 8);
-            document.getElementById('uptime').textContent = uptimeString;
-        }
-        
-        setInterval(updateClock, 1000);
-        updateClock();
         
         // Update the countdown every second
         const countdown = setInterval(function() {
@@ -879,7 +315,8 @@
                 document.getElementById("hours").innerHTML = "00";
                 document.getElementById("minutes").innerHTML = "00";
                 document.getElementById("seconds").innerHTML = "00";
-                document.getElementById("status").textContent = "COMPLETE";
+                document.querySelector(".header .subtitle").innerHTML = "TARGET TIME REACHED";
+                document.querySelector(".status-line div:first-child").innerHTML = "SYSTEM: <span class='blink'>COMPLETE</span>";
                 document.getElementById("progress-bar").style.width = "100%";
                 return;
             }
@@ -901,353 +338,21 @@
             const timePassed = totalTime - distance;
             const progressPercentage = Math.min(100, (timePassed / totalTime) * 100);
             document.getElementById("progress-bar").style.width = progressPercentage + "%";
-            
-            // Update status message
-            if (days === 0 && hours < 24) {
-                document.getElementById("status").textContent = "FINAL COUNTDOWN";
-            }
         }, 1000);
-        
-        // Terminal functionality
-        const terminalInput = document.getElementById('terminal-input');
-        const terminalOutput = document.getElementById('terminal-output');
-        
-        terminalInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                const command = terminalInput.value.trim();
-                terminalInput.value = '';
-                
-                // Add command to output
-                const promptLine = document.querySelector('.terminal .prompt:last-child');
-                if (promptLine) {
-                    promptLine.innerHTML += command;
-                }
-                
-                // Process command
-                processCommand(command);
-                
-                // Add new prompt
-                const newPrompt = document.createElement('div');
-                newPrompt.className = 'terminal-line prompt';
-                newPrompt.textContent = 'user@vt320:~$ ';
-                terminalOutput.appendChild(newPrompt);
-                
-                // Scroll to bottom
-                terminalOutput.scrollTop = terminalOutput.scrollHeight;
-            }
-        });
-        
-        function processCommand(command) {
-            const output = document.createElement('div');
-            output.className = 'terminal-line';
-            
-            switch(command.toLowerCase()) {
-                case 'help':
-                    output.innerHTML = 'Available commands:<br>' +
-                                      'help - Show this help<br>' +
-                                      'time - Show current time<br>' +
-                                      'date - Show current date<br>' +
-                                      'clear - Clear terminal<br>' +
-                                      'timer - Show countdown status<br>' +
-                                      'uptime - Show system uptime<br>' +
-                                      'calc - Open calculator<br>' +
-                                      'games - Show available games';
-                    break;
-                case 'time':
-                    output.textContent = new Date().toLocaleTimeString();
-                    break;
-                case 'date':
-                    output.textContent = new Date().toDateString();
-                    break;
-                case 'clear':
-                    terminalOutput.innerHTML = '<div class="terminal-line prompt">user@vt320:~$ </div>';
-                    return;
-                case 'timer':
-                    const now = new Date().getTime();
-                    const distance = targetDate.getTime() - now;
-                    if (distance < 0) {
-                        output.textContent = 'Countdown complete!';
-                    } else {
-                        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-                        output.textContent = `Time remaining: ${days}d ${hours}h ${minutes}m ${seconds}s`;
-                    }
-                    break;
-                case 'uptime':
-                    const uptime = new Date(new Date() - startTime);
-                    output.textContent = uptime.toISOString().substr(11, 8);
-                    break;
-                case 'calc':
-                    showApp('calculator');
-                    output.textContent = 'Opening calculator...';
-                    break;
-                case 'games':
-                    output.innerHTML = 'Available games:<br>' +
-                                      '- Tic-Tac-Toe (type: tictactoe)<br>' +
-                                      '- Memory Game (type: memory)';
-                    break;
-                case 'tictactoe':
-                    showApp('tictactoe');
-                    output.textContent = 'Opening Tic-Tac-Toe...';
-                    break;
-                case 'memory':
-                    showApp('memory');
-                    output.textContent = 'Opening Memory Game...';
-                    break;
-                case '':
-                    output.textContent = '';
-                    break;
-                default:
-                    output.textContent = `Command not found: ${command}. Type 'help' for available commands.`;
-            }
-            
-            terminalOutput.appendChild(output);
-        }
-        
-        // Tic-Tac-Toe game
-        let currentPlayer = 'X';
-        let gameBoard = ['', '', '', '', '', '', '', '', ''];
-        let gameActive = true;
-        
-        const gameStatus = document.getElementById('game-status');
-        const gameCells = document.querySelectorAll('.game-cell');
-        
-        gameCells.forEach(cell => {
-            cell.addEventListener('click', handleCellClick);
-        });
-        
-        function handleCellClick(e) {
-            const cellIndex = parseInt(e.target.getAttribute('data-cell'));
-            
-            if (gameBoard[cellIndex] !== '' || !gameActive) {
-                return;
-            }
-            
-            gameBoard[cellIndex] = currentPlayer;
-            e.target.textContent = currentPlayer;
-            
-            if (checkWinner()) {
-                gameStatus.textContent = `Player ${currentPlayer} wins!`;
-                gameActive = false;
-                return;
-            }
-            
-            if (gameBoard.every(cell => cell !== '')) {
-                gameStatus.textContent = "It's a draw!";
-                gameActive = false;
-                return;
-            }
-            
-            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-            gameStatus.textContent = `Player ${currentPlayer}'s turn`;
-        }
-        
-        function checkWinner() {
-            const winPatterns = [
-                [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
-                [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
-                [0, 4, 8], [2, 4, 6] // diagonals
-            ];
-            
-            return winPatterns.some(pattern => {
-                const [a, b, c] = pattern;
-                return gameBoard[a] !== '' && 
-                       gameBoard[a] === gameBoard[b] && 
-                       gameBoard[a] === gameBoard[c];
-            });
-        }
-        
-        function resetGame() {
-            currentPlayer = 'X';
-            gameBoard = ['', '', '', '', '', '', '', '', ''];
-            gameActive = true;
-            gameStatus.textContent = "Your turn (X)";
-            gameCells.forEach(cell => {
-                cell.textContent = '';
-            });
-        }
-        
-        // Calculator functionality
-        let calcDisplay = document.getElementById('calc-display');
-        let calcValue = '0';
-        
-        function appendToCalc(value) {
-            if (calcValue === '0' || calcValue === 'Error') {
-                calcValue = value;
-            } else {
-                calcValue += value;
-            }
-            calcDisplay.textContent = calcValue;
-        }
-        
-        function clearCalc() {
-            calcValue = '0';
-            calcDisplay.textContent = calcValue;
-        }
-        
-        function backspaceCalc() {
-            if (calcValue.length > 1) {
-                calcValue = calcValue.slice(0, -1);
-            } else {
-                calcValue = '0';
-            }
-            calcDisplay.textContent = calcValue;
-        }
-        
-        function calculateResult() {
-            try {
-                // Using Function constructor instead of eval for safety
-                calcValue = Function('"use strict"; return (' + calcValue + ')')().toString();
-                calcDisplay.textContent = calcValue;
-            } catch (error) {
-                calcValue = 'Error';
-                calcDisplay.textContent = calcValue;
-            }
-        }
-        
-        // Memory Game
-        let memoryCards = [];
-        let flippedCards = [];
-        let matchedPairs = 0;
-        let memoryGameActive = false;
-        
-        function initializeMemoryGame() {
-            const symbols = ['A', 'B', 'C', 'D', 'E', 'F', 'A', 'B', 'C', 'D', 'E', 'F'];
-            memoryCards = shuffleArray([...symbols]);
-            matchedPairs = 0;
-            flippedCards = [];
-            memoryGameActive = true;
-            
-            const memoryGrid = document.getElementById('memory-grid');
-            memoryGrid.innerHTML = '';
-            
-            memoryCards.forEach((symbol, index) => {
-                const card = document.createElement('div');
-                card.className = 'memory-card';
-                card.dataset.index = index;
-                card.dataset.symbol = symbol;
-                
-                const front = document.createElement('div');
-                front.className = 'front';
-                front.textContent = '?';
-                
-                const back = document.createElement('div');
-                back.className = 'back';
-                back.textContent = symbol;
-                
-                card.appendChild(front);
-                card.appendChild(back);
-                
-                card.addEventListener('click', handleMemoryCardClick);
-                memoryGrid.appendChild(card);
-            });
-            
-            document.getElementById('memory-status').textContent = 'Find all matching pairs!';
-        }
-        
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-        
-        function handleMemoryCardClick(e) {
-            if (!memoryGameActive) return;
-            
-            const card = e.currentTarget;
-            if (card.classList.contains('flipped') || flippedCards.length >= 2) return;
-            
-            card.classList.add('flipped');
-            flippedCards.push(card);
-            
-            if (flippedCards.length === 2) {
-                const [card1, card2] = flippedCards;
-                if (card1.dataset.symbol === card2.dataset.symbol) {
-                    // Match found
-                    matchedPairs++;
-                    flippedCards = [];
-                    
-                    if (matchedPairs === memoryCards.length / 2) {
-                        document.getElementById('memory-status').textContent = 'You won! All pairs found!';
-                        memoryGameActive = false;
-                    }
-                } else {
-                    // No match
-                    memoryGameActive = false;
-                    setTimeout(() => {
-                        card1.classList.remove('flipped');
-                        card2.classList.remove('flipped');
-                        flippedCards = [];
-                        memoryGameActive = true;
-                    }, 1000);
-                }
-            }
-        }
-        
-        function resetMemoryGame() {
-            initializeMemoryGame();
-        }
-        
-        // Text Editor
-        function newDocument() {
-            if (confirm('Create new document? Unsaved changes will be lost.')) {
-                document.getElementById('editor-area').value = '';
-            }
-        }
-        
-        function saveDocument() {
-            const content = document.getElementById('editor-area').value;
-            localStorage.setItem('savedDocument', content);
-            alert('Document saved to browser storage.');
-        }
-        
-        function loadDocument() {
-            const savedContent = localStorage.getItem('savedDocument');
-            if (savedContent) {
-                document.getElementById('editor-area').value = savedContent;
-                alert('Document loaded from browser storage.');
-            } else {
-                alert('No saved document found.');
-            }
-        }
-        
-        // File Manager
-        const fileContents = {
-            'readme.txt': 'DEC VT-320 Multi-Function Terminal\n\nThis system includes:\n- Countdown Timer\n- Terminal Emulator\n- Tic-Tac-Toe Game\n- Memory Card Game\n- Scientific Calculator\n- Text Editor\n- File Manager\n\nUse the menu to navigate between applications.',
-            'system.log': 'SYSTEM LOG\n\nBOOT: System initialized successfully\nTIMER: Countdown module loaded\nTERMINAL: VT-320 emulation active\nGAMES: Game system ready\nEDITOR: Text editor initialized\nFILES: File manager operational\n\nAll systems nominal.',
-            'todo.txt': 'TODO LIST\n\n- Add more terminal commands\n- Implement file saving/loading\n- Add more games\n- Improve calculator functions\n- Add sound effects\n- Create user profiles',
-            'notes.txt': 'PERSONAL NOTES\n\nRemember to:\n- Check the countdown timer\n- Practice with the terminal\n- Play some games to pass time\n- Make notes in the text editor\n\nSystem is running smoothly.'
-        };
-        
-        function viewFile(filename) {
-            document.getElementById('file-content').textContent = fileContents[filename] || 'File not found.';
-        }
         
         // Add random flicker for authenticity
         setInterval(() => {
-            const screen = document.querySelector('.screen');
-            if (Math.random() > 0.97) {
-                screen.style.opacity = Math.random() * 0.2 + 0.8;
-                setTimeout(() => {
-                    screen.style.opacity = 1;
-                }, 50);
-            }
-        }, 200);
-        
-        // Add occasional screen "glitch"
-        setInterval(() => {
+            const flicker = document.querySelector('.flicker');
             if (Math.random() > 0.95) {
-                const screen = document.querySelector('.screen');
-                screen.style.transform = 'translateX(' + (Math.random() * 4 - 2) + 'px)';
-                setTimeout(() => {
-                    screen.style.transform = 'translateX(0)';
-                }, 100);
+                flicker.style.opacity = Math.random() * 0.2 + 0.8;
             }
-        }, 3000);
+        }, 100);
     </script>
 </body>
 </html>
+
+
+
+
+
+
