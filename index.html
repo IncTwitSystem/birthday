@@ -3,355 +3,450 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VT-100 Countdown Timer</title>
+    <title>Ask the Horse</title>
     <style>
-        * {
+        body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            background-color: #000;
-            color: #0f0;
-            font-family: 'VT323', monospace;
+            font-family: Arial, sans-serif;
+            background: #1e90ff;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            position: relative;
             overflow: hidden;
         }
         
-        .crt {
-            background-color: #001100;
-            border: 15px solid #333;
-            border-radius: 10px;
+        body::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
             width: 100%;
-            max-width: 700px;
-            height: 500px;
-            position: relative;
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
-            overflow: hidden;
+            height: 60%;
+            background: #32cd32;
+            clip-path: ellipse(100% 60% at 50% 100%);
+            z-index: 0;
         }
         
-        .crt::before {
-            content: "";
+        body::after {
+            content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
             bottom: 0;
-            background: 
-                linear-gradient(rgba(0, 30, 0, 0.1) 50%, rgba(0, 0, 0, 0.1) 50%),
-                radial-gradient(circle at 50% 50%, rgba(0, 50, 0, 0.1), rgba(0, 0, 0, 0.3));
-            background-size: 100% 4px, 100% 100%;
-            z-index: 2;
-            pointer-events: none;
+            left: 0;
+            width: 100%;
+            height: 45%;
+            background: #00c851;
+            clip-path: ellipse(100% 50% at 50% 100%);
+            z-index: 0;
         }
         
-        .crt::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 50% 50%, transparent 70%, rgba(0, 20, 0, 0.7));
-            z-index: 3;
-            pointer-events: none;
-        }
-        
-        .screen {
-            padding: 30px;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
+        .container {
             position: relative;
+            max-width: 600px;
             z-index: 1;
         }
         
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 1px solid #0a0;
-            padding-bottom: 10px;
-        }
-        
-        .title {
-            font-size: 1.8rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-        
-        .subtitle {
-            font-size: 1rem;
-            color: #0a0;
-            margin-top: 5px;
-        }
-        
-        .timer-display {
-            text-align: center;
-            margin: 40px 0;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        
-        .time-row {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-        
-        .time-unit {
-            margin: 0 15px;
-            text-align: center;
-        }
-        
-        .time-value {
-            font-size: 4rem;
-            line-height: 1;
-            text-shadow: 0 0 10px #0f0;
-            background-color: rgba(0, 20, 0, 0.5);
-            padding: 10px;
-            border: 1px solid #0a0;
-            min-width: 120px;
-        }
-        
-        .time-label {
-            font-size: 1.2rem;
-            margin-top: 10px;
-            color: #0a0;
-            text-transform: uppercase;
-        }
-        
-        .separator {
-            font-size: 4rem;
-            line-height: 1;
-            align-self: center;
-            animation: blink 1.5s infinite;
-        }
-        
-        .progress-container {
-            width: 100%;
-            height: 20px;
-            background-color: #002200;
-            border: 1px solid #0a0;
-            margin: 20px 0;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .progress-bar {
-            height: 100%;
-            background-color: #0f0;
-            width: 0%;
-            box-shadow: 0 0 10px #0f0;
-        }
-        
-        .progress-labels {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 5px;
-            font-size: 0.9rem;
-            color: #0a0;
-        }
-        
-        .status-line {
-            border-top: 1px solid #0a0;
-            padding-top: 10px;
-            margin-top: 20px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 1.1rem;
-        }
-        
-        .blink {
-            animation: blink 1s infinite;
-        }
-        
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-        
-        .flicker {
-            animation: flicker 0.1s infinite;
-        }
-        
-        @keyframes flicker {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.95; }
-        }
-        
-        /* CRT curvature effect */
-        .crt-curve {
+        .speech-bubble {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border-radius: 10px;
-            box-shadow: 
-                inset 0 0 60px rgba(0, 30, 0, 0.5),
-                inset 0 0 100px rgba(0, 20, 0, 0.3);
-            z-index: 4;
+            top: -80px;
+            left: -30px;
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            min-width: 200px;
+            z-index: 10;
+            opacity: 0.3;
             pointer-events: none;
         }
         
-        /* Power light */
-        .power-light {
+        .speech-bubble.fed {
+            opacity: 1;
+            cursor: pointer;
+            pointer-events: all;
+        }
+        
+        .speech-bubble.fed:hover {
+            transform: scale(1.05);
+        }
+        
+        .speech-bubble::after {
+            content: '';
             position: absolute;
-            bottom: 15px;
-            right: 15px;
-            width: 12px;
-            height: 12px;
+            bottom: 30%;
+            right: -15px;
+            width: 0;
+            height: 0;
+            border-top: 15px solid transparent;
+            border-bottom: 15px solid transparent;
+            border-left: 15px solid white;
+        }
+        
+        .carrot {
+            position: absolute;
+            top: 380px;
+            left: 10%;
+            transform: translateX(-50%);
+            cursor: grab;
+            font-size: 50px;
+            z-index: 5;
+            user-select: none;
+        }
+        
+        .carrot:not(.dragging):hover {
+            transform: translateX(-50%) scale(1.2);
+        }
+        
+        .carrot.dragging {
+            cursor: grabbing;
+            z-index: 100;
+            transform: none;
+        }
+        
+        .carrot.eaten {
+            display: none;
+        }
+        
+        .feed-zone {
+            position: absolute;
+            top: 180px;
+            left: 50px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
-            background-color: #0f0;
-            box-shadow: 0 0 10px #0f0;
-            animation: pulse 2s infinite;
+            z-index: 1;
         }
         
-        @keyframes pulse {
-            0%, 100% { opacity: 0.7; }
-            50% { opacity: 1; }
+        .instruction {
+            display: none;
         }
         
-        @media (max-width: 600px) {
-            .time-value {
-                font-size: 2.5rem;
-                min-width: 80px;
-            }
-            
-            .separator {
-                font-size: 2.5rem;
-            }
-            
-            .time-unit {
-                margin: 0 8px;
-            }
+        .bubble-text {
+            font-size: 18px;
+            color: #333;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .question-menu {
+            position: absolute;
+            top: -110px;
+            left: -30px;
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            display: none;
+            z-index: 20;
+            min-width: 250px;
+        }
+        
+        .question-menu.active {
+            display: block;
+        }
+        
+        .question-option {
+            padding: 12px;
+            margin: 5px 0;
+            background: #f0f0f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .question-option:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .answer-display {
+            position: absolute;
+            top: -80px;
+            left: -30px;
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            display: none;
+            z-index: 15;
+            min-width: 280px;
+            max-width: 350px;
+        }
+        
+        .answer-display.active {
+            display: block;
+        }
+        
+        .answer-display::after {
+            content: '';
+            position: absolute;
+            bottom: 30%;
+            right: -15px;
+            width: 0;
+            height: 0;
+            border-top: 15px solid transparent;
+            border-bottom: 15px solid transparent;
+            border-left: 15px solid white;
+        }
+        
+        .back-btn {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .back-btn:hover {
+            background: #764ba2;
         }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="crt flicker">
-        <div class="crt-curve"></div>
-        <div class="screen">
-            <div class="header">
-                <div class="title">DEC VT-100 COUNTDOWN SYSTEM</div>
-                <div class="subtitle">TIME TO TARGET: 05 OCT 10:00 EDT</div>
-            </div>
-            
-            <div class="timer-display">
-                <div class="time-row">
-                    <div class="time-unit">
-                        <div class="time-value" id="days">00</div>
-                        <div class="time-label">DAYS</div>
-                    </div>
-                    <div class="separator">:</div>
-                    <div class="time-unit">
-                        <div class="time-value" id="hours">00</div>
-                        <div class="time-label">HOURS</div>
-                    </div>
-                </div>
-                
-                <div class="time-row">
-                    <div class="time-unit">
-                        <div class="time-value" id="minutes">00</div>
-                        <div class="time-label">MINUTES</div>
-                    </div>
-                    <div class="separator">:</div>
-                    <div class="time-unit">
-                        <div class="time-value" id="seconds">00</div>
-                        <div class="time-label">SECONDS</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="progress-container">
-                <div class="progress-bar" id="progress-bar"></div>
-            </div>
-            <div class="progress-labels">
-                <div>00:00</div>
-                <div>SYSTEM PROGRESS</div>
-                <div>05 OCT</div>
-            </div>
-            
-            <div class="status-line">
-                <div>SYSTEM: <span class="blink">READY</span></div>
-                <div>MEMORY: 64KB</div>
-                <div>CPU: Z80 @ 4MHz</div>
-            </div>
-            
-            <div class="power-light"></div>
+    <div class="container">
+        <div class="speech-bubble" id="speechBubble">
+            <div class="bubble-text">Feed me a carrot first! 🥕</div>
         </div>
+        
+        <div class="feed-zone" id="feedZone"></div>
+        
+        <div class="carrot" id="carrot">🥕</div>
+        
+        <div class="question-menu" id="questionMenu">
+            <div class="question-option" data-question="name">What's your name?</div>
+            <div class="question-option" data-question="home">Where do you live?</div>
+            <div class="question-option" data-question="favorite">What's your favorite food?</div>
+            <div class="question-option" data-question="hobby">What do you like to do?</div>
+            <div class="question-option" data-question="dream">What's your dream?</div>
+        </div>
+        
+        <div class="answer-display" id="answerDisplay">
+            <div id="answerText"></div>
+            <button class="back-btn" id="backBtn">Ask another question</button>
+        </div>
+        
+        <svg width="500" height="450" viewBox="40 60 480 400" xmlns="http://www.w3.org/2000/svg">
+            <!-- Horse body converted from the CoreGraphics paths -->
+            <path d="M132.673,269.035 L137.673,289.835 L147.173,310.785 L151.423,337.285 L153.173,360.285 L155.173,390.285 L153.923,405.535 L147.923,416.035 L139.173,426.285 L133.923,432.785 L148.923,436.535 L158.173,435.785 L162.423,428.535 L160.173,423.035 L165.923,412.285 C165.923,412.285 169.173,405.285 169.423,405.285 C169.673,405.285 171.673,384.035 171.673,384.035 L171.173,327.285 L170.173,293.785 L174.673,285.035 L132.673,269.035 Z" fill="rgb(228,173,95)" stroke="rgb(228,173,95)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+            
+            <path d="M176.673,282.535 L182.173,304.535 L188.673,330.035 L188.923,346.785 L191.673,357.285 L197.923,368.285 L201.673,385.035 L200.673,404.035 L199.923,415.785 L190.923,427.285 L184.423,432.785 L199.923,436.535 L212.173,434.535 L214.423,426.785 L209.423,419.035 L213.923,411.785 L217.173,408.535 L216.173,394.285 L209.173,377.035 L209.173,362.535 L206.923,323.785 L206.423,297.035 L205.173,282.285 L176.673,282.535 Z" fill="rgb(228,173,95)" stroke="rgb(228,173,95)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+            
+            <path d="M283.034,258.673 L299.434,280.873 L313.234,308.473 L327.034,332.273 L329.834,343.873 L335.434,353.873 L341.234,362.073 L342.234,397.273 L340.034,411.673 L333.234,425.873 L323.434,438.073 L347.434,439.334 L351.269,434.273 L348.434,425.873 L351.269,414.873 L357.634,402.073 L358.434,366.673 L358.034,340.473 L348.634,320.273 L338.234,307.473 C338.234,307.473 336.634,298.473 336.634,298.473 C336.634,298.473 341.434,276.673 341.434,276.673 L346.034,261.673 L347.234,247.473 L314.834,244.873 L283.034,258.673 Z" fill="rgb(228,173,95)" stroke="rgb(228,173,95)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+            
+            <path d="M325.328,250.673 L341.728,272.873 L355.528,300.473 L369.328,324.273 L372.128,335.873 L377.728,345.873 L383.528,354.073 L384.528,389.273 L382.328,403.673 L375.528,417.873 L365.728,430.073 L389.728,431.334 L393.563,426.273 L390.728,417.873 L393.563,406.873 L399.928,394.073 L400.728,358.673 L400.328,332.473 L390.928,312.273 L380.528,299.473 C380.528,299.473 378.928,290.473 378.928,290.473 C378.928,290.473 383.728,268.673 383.728,268.673 L388.328,253.673 L389.528,239.473 L357.128,236.873 L325.328,250.673 Z" fill="rgb(228,173,95)" stroke="rgb(228,173,95)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+            
+            <path d="M383.605,209.616 L401.526,218.014 L415.423,244.96 L420.51,278.321 L420.162,292.405 L424.974,313.873 L424.903,326.87 L425.752,349.225 L427.663,372.709 L434.141,395.511 L441.948,413.574 L456.052,415.537 L472.355,413.59 L471.619,387.451 L462.371,352.29 L452.253,316.298 L444.311,283.918 L436.448,254.936 C436.448,254.936 427.233,238.213 426.908,238.286 C426.583,238.359 409.679,210.193 409.679,210.193 L401.57,202.973 L379.94,200.181 L383.605,209.616 Z" fill="rgb(243,186,79)" stroke="rgb(238,223,154)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+            
+            <path d="M102.818,186.34 C102.818,186.34 113.162,204.169 113.162,204.169 C113.162,204.169 119.162,214.835 119.162,214.835 L119.162,230.835 L118.162,247.835 L122.496,263.835 L129.496,273.502 L146.496,282.502 L175.496,289.835 L216.829,287.835 L258.496,288.169 L286.162,282.169 L307.496,268.169 L320.829,257.502 L332.162,254.502 L389.496,250.169 L394.496,232.502 L393.829,213.169 L382.496,194.169 L356.829,173.169 L338.496,165.835 L310.162,168.865 L275.829,174.169 L242.162,175.169 L220.162,162.835 L192.162,151.835 L171.162,142.835 L154.496,133.502 L143.318,125.84 L102.818,186.34 Z" fill="rgb(168,46,14)"/>
+            
+            <path d="M116.421,234.644 L117.921,257.144 L132.673,277.644 L167.421,289.835 L199.421,289.835 L251.921,289.835 L286.162,282.169 L303.421,272.644 L325.328,261.644 L343.421,254.644 L373.921,253.644 L388.328,253.673 L394.496,241.144 L381.619,241.144 L354.921,247.644 L327.921,248.644 C327.921,248.644 301.921,259.644 301.921,260.644 C301.921,261.644 283.034,272.144 283.034,272.144 L239.421,279.644 L184.421,282.285 L139.921,269.035 L132.673,258.144 L126.921,236.873 Z" fill="rgb(228,173,95)" stroke="rgb(228,173,95)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+            
+            <!-- Head -->
+            <path d="M72.068,83.84 L61.318,94.09 L58.068,104.59 L55.068,111.84 L52.568,121.84 L52.318,143.34 L50.068,156.34 L44.068,165.59 L43.318,182.34 L51.318,193.84 L62.568,197.09 L71.818,193.59 L73.318,178.09 L80.318,166.34 L94.318,162.34 L98.318,176.09 L102.818,186.34 L143.318,125.84 L129.068,115.09 L113.568,104.34 L97.818,93.09 L87.568,85.34 L81.068,82.84 L72.068,83.84 Z" fill="rgb(228,173,95)" stroke="rgb(228,173,95)" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+            
+            <!-- Ears -->
+            <path d="M69.369,85.265 L65.769,78.265 L61.569,68.665 L55.569,64.665 L52.769,69.065 L54.169,82.465 L61.443,91.861 L66.041,93.426 L70.041,89.176 L69.369,85.265 Z" fill="rgb(188,78,69)" stroke="rgb(136,47,28)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            
+            <path d="M93.969,77.865 L90.169,70.465 L82.769,63.465 L82.169,71.065 L81.569,79.065 L83.603,86.926 L91.291,89.801 C91.291,89.801 94.169,85.265 94.169,85.265 C94.169,85.265 93.969,77.865 93.969,77.865 Z" fill="rgb(188,78,69)" stroke="rgb(136,47,28)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            
+            <!-- Eyes -->
+            <ellipse cx="89.5" cy="118.9" rx="3" ry="4.5" fill="black"/>
+            <ellipse cx="52.5" cy="175.7" rx="2.5" ry="4.8" fill="black"/>
+            <ellipse cx="63.97" cy="173.67" rx="2.5" ry="4.8" fill="black"/>
+            
+            <!-- Nostrils -->
+            <ellipse cx="87.4" cy="78.55" rx="2.5" ry="4" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
+            <ellipse cx="61.4" cy="80.1" rx="3" ry="4" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
+            
+            <!-- Mane -->
+            <path d="M147.097,124.405 L164.519,134.946 L181.186,143.279 L201.853,151.279 L221.186,160.279 L237.186,168.865 L249.186,170.929 L276.186,170.929 L291.861,168.865 L304.519,165.613 L322.519,162.613 L337.519,161.279 L350.519,164.613 L361.186,170.929 L375.951,181.946 L381.619,190.937 L371.411,195.683 L357.211,194.283 L348.343,212.083 L329.722,205.683 L312.011,217.883 L300.011,206.283 L281.011,219.083 L261.211,208.883 L240.352,217.859 L228.811,208.083 L202.411,217.083 L182.152,202.259 L156.152,205.459 L149.811,183.683 L132.673,178.465 L140.352,160.259 L135.552,141.659 L147.097,124.405 Z" fill="rgb(243,186,79)" stroke="rgb(238,223,154)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+            
+            <!-- Mane spots/details -->
+            <ellipse cx="161.6" cy="155.15" rx="7" ry="8" fill="rgb(188,78,69)" stroke="rgb(136,47,28)" stroke-width="1"/>
+            <ellipse cx="158.7" cy="157.57" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
+            <ellipse cx="164.5" cy="154.06" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
+            <ellipse cx="161.6" cy="150.75" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
+            
+            <ellipse cx="193.5" cy="191.03" rx="7" ry="8" fill="rgb(188,78,69)" stroke="rgb(136,47,28)" stroke-width="1"/>
+            <ellipse cx="190.6" cy="193.46" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
+            <ellipse cx="196.4" cy="190.95" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
+            <ellipse cx="193.5" cy="187.48" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
+            
+            <ellipse cx="255.4" cy="195.27" rx="7" ry="8" fill="rgb(188,78,69)" stroke="rgb(136,47,28)" stroke-width="1"/>
+            <ellipse cx="252.5" cy="197.71" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
+            <ellipse cx="258.3" cy="195.27" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
+            <ellipse cx="255.4" cy="191.73" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
+            
+            <ellipse cx="277.4" cy="191.03" rx="7" ry="8" fill="rgb(188,78,69)" stroke="rgb(136,47,28)" stroke-width="1"/>
+            <ellipse cx="274.5" cy="193.46" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
+            <ellipse cx="280.3" cy="190.95" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
+            <ellipse cx="277.4" cy="187.48" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
+            
+            <ellipse cx="340.7" cy="182.88" rx="7" ry="8" fill="rgb(188,78,69)" stroke="rgb(136,47,28)" stroke-width="1"/>
+            <ellipse cx="337.9" cy="185.32" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
+            <ellipse cx="343.7" cy="182.88" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
+            <ellipse cx="340.8" cy="179.35" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
+            
+            <ellipse cx="165.5" cy="181.08" rx="7" ry="8" fill="rgb(188,78,69)" stroke="rgb(136,47,28)" stroke-width="1"/>
+            <ellipse cx="162.6" cy="183.52" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
+            <ellipse cx="168.4" cy="181.08" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
+            <ellipse cx="165.5" cy="177.55" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
+            
+            <ellipse cx="222.8" cy="189.44" rx="7" ry="8" fill="rgb(188,78,69)" stroke="rgb(136,47,28)" stroke-width="1"/>
+            <ellipse cx="219.9" cy="191.88" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
+            <ellipse cx="225.7" cy="189.44" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
+            <ellipse cx="222.8" cy="185.91" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
+            
+            <ellipse cx="314.8" cy="195.27" rx="7" ry="8" fill="rgb(188,78,69)" stroke="rgb(136,47,28)" stroke-width="1"/>
+            <ellipse cx="311.9" cy="197.71" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
+            <ellipse cx="317.7" cy="195.27" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
+            <ellipse cx="314.8" cy="191.73" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
+            
+            <!-- Mouth/smile -->
+            <path d="M66.91,195.614 C61.136,199.484 54.948,200.373 53.091,197.6 C51.233,194.828 57.785,194.189 63.559,190.319 C69.334,186.45 72.146,180.816 74.003,183.588 C75.861,186.361 72.685,191.745 66.91,195.614 Z" fill="rgb(166,64,56)"/>
+            
+            <!-- Neck/body lines -->
+            <path d="M101.56,187.646 L119.06,214.021 L117.31,233.271" stroke="rgb(228,173,95)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M380.943,192.212 L393.318,216.649 L393.568,240.649" stroke="rgb(238,223,154)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
     </div>
 
     <script>
-        // Set the target date (Friday, October 5th, 10:00 AM Florida time - Eastern Time)
-        const now = new Date();
-        const currentYear = now.getFullYear();
+        const answers = {
+            name: "My name is Pizzy! Nice to meet you! 🍕",
+            home: "I live on the Windows XP wallpaper! You know, those beautiful green hills! (That is a hint) 💚",
+            favorite: "I absolutely love pizza! It's my favorite food ever! 🍕",
+            hobby: "I like to eat pizza! It's the best thing in the world! 🍕",
+            dream: "My dream is to make people happy! 😊"
+        };
+
+        const speechBubble = document.getElementById('speechBubble');
+        const questionMenu = document.getElementById('questionMenu');
+        const answerDisplay = document.getElementById('answerDisplay');
+        const answerText = document.getElementById('answerText');
+        const backBtn = document.getElementById('backBtn');
+        const questionOptions = document.querySelectorAll('.question-option');
+        const carrot = document.getElementById('carrot');
+        const feedZone = document.getElementById('feedZone');
+        const instruction = document.getElementById('instruction');
         
-        // Create target date for October 5th, 10:00 AM Eastern Time
-        const targetDate = new Date(currentYear, 9, 5, 10, 0, 0); // Months are 0-indexed (9 = October)
-        
-        // If the date has already passed this year, set it for next year
-        if (now > targetDate) {
-            targetDate.setFullYear(currentYear + 1);
+        let currentCarrotAvailable = true;
+        let isDragging = false;
+
+        // Dragging functionality
+        carrot.addEventListener('mousedown', startDrag);
+        carrot.addEventListener('touchstart', startDrag);
+
+        function startDrag(e) {
+            if (!currentCarrotAvailable) return;
+            e.preventDefault();
+            isDragging = true;
+            carrot.classList.add('dragging');
+            
+            // Remove transform and position absolutely
+            carrot.style.transform = 'none';
+            carrot.style.position = 'fixed';
+            
+            // Position carrot at mouse/touch position immediately
+            const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+            
+            carrot.style.left = (clientX - 25) + 'px'; // Center the emoji (50px / 2)
+            carrot.style.top = (clientY - 25) + 'px';
         }
-        
-        // Update the countdown every second
-        const countdown = setInterval(function() {
-            const now = new Date().getTime();
-            const distance = targetDate.getTime() - now;
+
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('touchmove', drag);
+
+        function drag(e) {
+            if (!isDragging) return;
+            e.preventDefault();
             
-            // If the countdown is over
-            if (distance < 0) {
-                clearInterval(countdown);
-                document.getElementById("days").innerHTML = "00";
-                document.getElementById("hours").innerHTML = "00";
-                document.getElementById("minutes").innerHTML = "00";
-                document.getElementById("seconds").innerHTML = "00";
-                document.querySelector(".header .subtitle").innerHTML = "TARGET TIME REACHED";
-                document.querySelector(".status-line div:first-child").innerHTML = "SYSTEM: <span class='blink'>COMPLETE</span>";
-                document.getElementById("progress-bar").style.width = "100%";
-                return;
+            const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+            
+            carrot.style.left = (clientX - 25) + 'px';
+            carrot.style.top = (clientY - 25) + 'px';
+        }
+
+        document.addEventListener('mouseup', stopDrag);
+        document.addEventListener('touchend', stopDrag);
+
+        function stopDrag(e) {
+            if (!isDragging) return;
+            isDragging = false;
+            carrot.classList.remove('dragging');
+            
+            const carrotRect = carrot.getBoundingClientRect();
+            const feedZoneRect = feedZone.getBoundingClientRect();
+            
+            // Check if carrot overlaps with feed zone
+            if (!(carrotRect.right < feedZoneRect.left || 
+                  carrotRect.left > feedZoneRect.right || 
+                  carrotRect.bottom < feedZoneRect.top || 
+                  carrotRect.top > feedZoneRect.bottom)) {
+                feedHorse();
+            } else {
+                // Return carrot to original position if not fed
+                resetCarrot();
             }
-            
-            // Calculate time units
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-            
-            // Display the results
-            document.getElementById("days").innerHTML = days.toString().padStart(2, '0');
-            document.getElementById("hours").innerHTML = hours.toString().padStart(2, '0');
-            document.getElementById("minutes").innerHTML = minutes.toString().padStart(2, '0');
-            document.getElementById("seconds").innerHTML = seconds.toString().padStart(2, '0');
-            
-            // Calculate progress percentage (for a 7-day period)
-            const totalTime = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
-            const timePassed = totalTime - distance;
-            const progressPercentage = Math.min(100, (timePassed / totalTime) * 100);
-            document.getElementById("progress-bar").style.width = progressPercentage + "%";
-        }, 1000);
-        
-        // Add random flicker for authenticity
-        setInterval(() => {
-            const flicker = document.querySelector('.flicker');
-            if (Math.random() > 0.95) {
-                flicker.style.opacity = Math.random() * 0.2 + 0.8;
+        }
+
+        function resetCarrot() {
+            carrot.style.position = 'absolute';
+            carrot.style.left = '10%';
+            carrot.style.top = '380px';
+            carrot.style.transform = 'translateX(-50%)';
+        }
+
+        function feedHorse() {
+            currentCarrotAvailable = false;
+            carrot.classList.add('eaten');
+            speechBubble.classList.add('fed');
+            speechBubble.querySelector('.bubble-text').textContent = 'Ask me a question! 🐴';
+        }
+
+        function spawnNewCarrot() {
+            currentCarrotAvailable = true;
+            carrot.classList.remove('eaten');
+            resetCarrot();
+        }
+
+        speechBubble.addEventListener('click', function() {
+            if (speechBubble.classList.contains('fed')) {
+                questionMenu.classList.add('active');
+                speechBubble.style.display = 'none';
             }
-        }, 100);
+        });
+
+        questionOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                const question = this.getAttribute('data-question');
+                answerText.textContent = answers[question];
+                questionMenu.classList.remove('active');
+                answerDisplay.classList.add('active');
+                
+                // Reset for next question
+                speechBubble.classList.remove('fed');
+                speechBubble.querySelector('.bubble-text').textContent = 'Feed me a carrot first! 🥕';
+            });
+        });
+
+        backBtn.addEventListener('click', function() {
+            answerDisplay.classList.remove('active');
+            speechBubble.style.display = 'block';
+            
+            // Spawn new carrot for next question
+            spawnNewCarrot();
+        });
     </script>
 </body>
 </html>
-
-
 
 
 
