@@ -3,447 +3,977 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ask the Horse</title>
+    <title>Rose Flower with Falling Petals</title>
     <style>
         body {
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
-            background: #1e90ff;
+            background: #1779FE;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            position: relative;
+            font-family: 'Georgia', serif;
             overflow: hidden;
+            position: relative;
         }
         
-        body::before {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
+        .bg-layer {
+            position: fixed;
             width: 100%;
-            height: 60%;
-            background: #32cd32;
-            clip-path: ellipse(100% 60% at 50% 100%);
+            height: 100%;
+            top: 0;
+            left: 0;
             z-index: 0;
         }
         
-        body::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
+        .bg-layer svg {
             width: 100%;
-            height: 45%;
-            background: #00c851;
-            clip-path: ellipse(100% 50% at 50% 100%);
-            z-index: 0;
+            height: 100%;
         }
         
         .container {
             position: relative;
-            max-width: 600px;
-            z-index: 1;
-        }
-        
-        .speech-bubble {
-            position: absolute;
-            top: -80px;
-            left: -30px;
-            background: white;
-            padding: 20px;
+            background: rgba(255,255,255,0.6);
             border-radius: 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            min-width: 200px;
-            z-index: 10;
-            opacity: 0.3;
-            pointer-events: none;
-        }
-        
-        .speech-bubble.fed {
-            opacity: 1;
-            cursor: pointer;
-            pointer-events: all;
-        }
-        
-        .speech-bubble.fed:hover {
-            transform: scale(1.05);
-        }
-        
-        .speech-bubble::after {
-            content: '';
-            position: absolute;
-            bottom: 30%;
-            right: -15px;
-            width: 0;
-            height: 0;
-            border-top: 15px solid transparent;
-            border-bottom: 15px solid transparent;
-            border-left: 15px solid white;
-        }
-        
-        .carrot {
-            position: absolute;
-            top: 380px;
-            left: 10%;
-            transform: translateX(-50%);
-            cursor: grab;
-            font-size: 50px;
-            z-index: 5;
-            user-select: none;
-        }
-        
-        .carrot:not(.dragging):hover {
-            transform: translateX(-50%) scale(1.2);
-        }
-        
-        .carrot.dragging {
-            cursor: grabbing;
-            z-index: 100;
-            transform: none;
-        }
-        
-        .carrot.eaten {
-            display: none;
-        }
-        
-        .feed-zone {
-            position: absolute;
-            top: 180px;
-            left: 50px;
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.3);
+            backdrop-filter: blur(10px);
+            overflow: visible;
+            padding: 20px;
             z-index: 1;
         }
         
-        .instruction {
-            display: none;
+        svg {
+            display: block;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.1));
         }
         
-        .bubble-text {
-            font-size: 18px;
-            color: #333;
+        .petal {
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: center;
+        }
+        
+        .petal:hover {
+            transform: scale(1.05);
+            filter: brightness(1.1) saturate(1.2);
+        }
+        
+        .falling {
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .fall-straight {
+            animation: fallStraight 3.5s ease-in forwards;
+        }
+        
+        .fall-spiral {
+            animation: fallSpiral 4s ease-out forwards;
+        }
+        
+        .fall-drift {
+            animation: fallDrift 5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+        
+        .fall-flutter {
+            animation: fallFlutter 4.5s ease-in-out forwards;
+        }
+        
+        .fall-tumble {
+            animation: fallTumble 3s linear forwards;
+        }
+        
+        @keyframes fallStraight {
+            0% {
+                transform: translateY(0) rotate(0deg) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(800px) rotate(15deg) scale(0.3);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes fallSpiral {
+            0% {
+                transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+                opacity: 1;
+            }
+            25% {
+                transform: translateY(200px) translateX(50px) rotate(90deg) scale(0.8);
+            }
+            50% {
+                transform: translateY(400px) translateX(-30px) rotate(180deg) scale(0.6);
+            }
+            75% {
+                transform: translateY(600px) translateX(40px) rotate(270deg) scale(0.4);
+            }
+            100% {
+                transform: translateY(800px) translateX(-20px) rotate(360deg) scale(0.2);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes fallDrift {
+            0% {
+                transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+                opacity: 1;
+            }
+            20% {
+                transform: translateY(150px) translateX(-60px) rotate(45deg) scale(0.9);
+            }
+            40% {
+                transform: translateY(300px) translateX(80px) rotate(-30deg) scale(0.7);
+            }
+            60% {
+                transform: translateY(450px) translateX(-40px) rotate(60deg) scale(0.5);
+            }
+            80% {
+                transform: translateY(650px) translateX(30px) rotate(-15deg) scale(0.3);
+            }
+            100% {
+                transform: translateY(800px) translateX(-10px) rotate(90deg) scale(0.1);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes fallFlutter {
+            0% {
+                transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+                opacity: 1;
+            }
+            10% {
+                transform: translateY(80px) translateX(20px) rotate(-45deg) scale(0.95);
+            }
+            20% {
+                transform: translateY(160px) translateX(-30px) rotate(30deg) scale(0.9);
+            }
+            30% {
+                transform: translateY(240px) translateX(40px) rotate(-60deg) scale(0.8);
+            }
+            40% {
+                transform: translateY(320px) translateX(-20px) rotate(45deg) scale(0.7);
+            }
+            50% {
+                transform: translateY(400px) translateX(50px) rotate(-30deg) scale(0.6);
+            }
+            70% {
+                transform: translateY(550px) translateX(-35px) rotate(75deg) scale(0.4);
+            }
+            85% {
+                transform: translateY(700px) translateX(25px) rotate(-45deg) scale(0.2);
+            }
+            100% {
+                transform: translateY(800px) translateX(0px) rotate(0deg) scale(0.1);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes fallTumble {
+            0% {
+                transform: translateY(0) rotate(0deg) scale(1);
+                opacity: 1;
+            }
+            25% {
+                transform: translateY(200px) rotate(180deg) scale(0.8);
+            }
+            50% {
+                transform: translateY(400px) rotate(360deg) scale(0.6);
+            }
+            75% {
+                transform: translateY(600px) rotate(540deg) scale(0.4);
+            }
+            100% {
+                transform: translateY(800px) rotate(720deg) scale(0.2);
+                opacity: 0;
+            }
+        }
+        
+        .stem {
+            filter: drop-shadow(2px 2px 4px rgba(0,100,0,0.3));
+        }
+        
+        .leaf {
+            transform-origin: bottom center;
+        }
+        
+        .leaf.fade-out {
+            animation: fadeOut 2s ease-out forwards !important;
+        }
+        
+        @keyframes leafSway {
+            0%, 100% { transform: rotate(-2deg); }
+            50% { transform: rotate(2deg); }
+        }
+        
+        .instructions {
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.9);
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 16px;
+            color: #8B4513;
             text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        
+        .petal-trail {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: radial-gradient(circle, #FF69B4, #FFB6C1);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: trail 2s ease-out forwards;
+        }
+        
+        @keyframes trail {
+            0% {
+                opacity: 0.8;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.2);
+            }
+        }
+        
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #FFD700;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: sparkle 1.5s ease-out forwards;
+        }
+        
+        .birthday-message {
+            position: absolute;
+            top: 35%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 72px;
+            font-weight: bold;
+            text-align: center;
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards;
+            font-family: 'Impact', 'Arial Black', sans-serif;
+        }
+        
+        .birthday-message .letter-red {
+            color: #DC143C;
+        }
+        
+        .birthday-message .letter-blue {
+            color: #6A0DAD;
+        }
+        
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        .wish-input {
+            position: absolute;
+            bottom: 28%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            padding: 18px 25px;
+            font-size: 20px;
+            border: 3px solid #DC143C;
+            border-radius: 50px;
+            text-align: center;
+            font-family: 'Arial', sans-serif;
+            background: #FFFFFF;
+            color: #333333;
+            outline: none;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 2s forwards;
+            box-sizing: border-box;
+            height: 60px;
+            margin: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .wish-input:focus {
+            border-color: #B22222;
+        }
+        
+        .wish-input::placeholder {
+            color: #DC143C;
+            opacity: 0.8;
+            font-style: italic;
+        }
+        
+        .send-button {
+            position: absolute;
+            bottom: 18%;
+            left: 50%;
+            transform: translateX(-190px);
+            padding: 15px 50px;
+            font-size: 18px;
+            font-weight: bold;
+            background: #6A0DAD;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Arial', sans-serif;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 2.5s forwards;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        
+        .send-button:hover {
+            background: #4B0082;
+            transform: translateX(-190px) scale(1.05);
+        }
+        
+        .send-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+            transform: translateX(-190px) scale(1);
+        }
+        
+        .message-button {
+            position: absolute;
+            bottom: 18%;
+            left: 50%;
+            transform: translateX(10px);
+            padding: 15px 50px;
+            font-size: 18px;
+            font-weight: bold;
+            background: #DC143C;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Arial', sans-serif;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 2.5s forwards;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        
+        .message-button:hover {
+            background: #B22222;
+            transform: translateX(10px) scale(1.05);
+        }
+        
+        .message-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .message-modal.show {
+            display: flex;
+        }
+        
+        .message-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        
+        .message-content h2 {
+            color: #DC143C;
+            font-family: 'Impact', 'Arial Black', sans-serif;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        
+        .message-content p {
+            color: #333;
+            font-family: 'Arial', sans-serif;
+            line-height: 1.8;
+            font-size: 18px;
+        }
+        
+        .close-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #DC143C;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            font-size: 20px;
+            cursor: pointer;
             font-weight: bold;
         }
         
-        .question-menu {
+        .close-button:hover {
+            background: #B22222;
+        }
+        
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideUp {
+            0% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(50px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+        
+        .confetti {
             position: absolute;
-            top: -110px;
-            left: -30px;
-            background: white;
-            padding: 15px;
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            display: none;
-            z-index: 20;
-            min-width: 250px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
         }
         
-        .question-menu.active {
-            display: block;
+        .confetti:nth-child(odd) {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
         }
         
-        .question-option {
-            padding: 12px;
-            margin: 5px 0;
-            background: #f0f0f0;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.2s;
+        .confetti:nth-child(3n) {
+            background: linear-gradient(45deg, #48cae4, #06ffa5);
         }
         
-        .question-option:hover {
-            background: #667eea;
-            color: white;
+        .confetti:nth-child(4n) {
+            background: linear-gradient(45deg, #f38ba8, #a8dadc);
         }
         
-        .answer-display {
-            position: absolute;
-            top: -80px;
-            left: -30px;
-            background: white;
-            padding: 20px;
-            border-radius: 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            display: none;
-            z-index: 15;
-            min-width: 280px;
-            max-width: 350px;
+        .confetti:nth-child(5n) {
+            background: linear-gradient(45deg, #b19cd9, #ff9a9e);
         }
         
-        .answer-display.active {
-            display: block;
+        .confetti:nth-child(6n) {
+            background: linear-gradient(45deg, #ffd89b, #19547b);
         }
         
-        .answer-display::after {
-            content: '';
-            position: absolute;
-            bottom: 30%;
-            right: -15px;
-            width: 0;
-            height: 0;
-            border-top: 15px solid transparent;
-            border-bottom: 15px solid transparent;
-            border-left: 15px solid white;
+        @keyframes confettiFall {
+            0% {
+                opacity: 1;
+                transform: translateY(-50px) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(600px) rotate(720deg);
+            }
         }
         
-        .back-btn {
-            margin-top: 10px;
-            padding: 8px 16px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
+        .fade-out {
+            animation: fadeOut 2s ease-out forwards;
         }
         
-        .back-btn:hover {
-            background: #764ba2;
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+        
+        .horse-head {
+            position: fixed;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+            filter: drop-shadow(-5px 5px 15px rgba(0,0,0,0.3));
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="speech-bubble" id="speechBubble">
-            <div class="bubble-text">Feed me a carrot first! 🥕</div>
-        </div>
+    <!-- Horse Head Peeking -->
+    <svg class="horse-head" width="180" height="250" viewBox="40 50 110 160">
+        <!-- Shape 1 - Main head -->
+        <path d="M 72.068 83.84 L 61.318 94.09 L 58.068 104.59 L 55.068 111.84 L 52.568 121.84 L 52.318 143.34 L 50.068 156.34 L 44.068 165.59 L 43.318 182.34 L 51.318 193.84 L 62.568 197.09 L 71.818 193.59 L 73.318 178.09 L 80.318 166.34 L 94.318 162.34 L 98.318 176.09 L 102.818 186.34 L 143.318 197.637 L 143.318 125.84 L 129.068 115.09 L 113.568 104.34 L 97.818 93.09 L 87.568 85.34 L 81.068 82.84 L 72.068 83.84 Z" 
+              fill="#A82E0E" stroke="#E4AD5F" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
         
-        <div class="feed-zone" id="feedZone"></div>
+        <!-- Shape 2 - Nostril -->
+        <path d="M 66.91 194.037 C 61.136 197.907 54.948 198.796 53.091 196.024 C 51.233 193.251 57.785 192.612 63.559 188.742 C 69.334 184.873 72.146 179.239 74.003 182.011 C 75.861 184.784 72.685 190.168 66.91 194.037 Z" 
+              fill="#BC4E45"/>
         
-        <div class="carrot" id="carrot">🥕</div>
+        <!-- Shape 3 - Face detail -->
+        <path d="M 104.023 91.82 L 96.023 84.356 L 77.023 78.07 L 65.406 82.229 L 57.023 93.192 L 51.524 102.82 L 47.523 117.57 L 46.273 133.32 L 46.273 144.07 L 50.523 150.32 L 60.129 155.82 L 65.406 149.027 L 69.273 135.57 L 77.023 135.57 L 86.273 136.57 L 95.773 144.07 L 103.773 133.82 L 105.023 125.921 L 112.755 123.82 L 129.523 127.356 L 135.023 123.07 L 140.362 117.57 L 120.273 101.82 L 104.023 91.82 Z" 
+              fill="#F3BA4F" stroke="#EEE09A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
         
-        <div class="question-menu" id="questionMenu">
-            <div class="question-option" data-question="name">What's your name?</div>
-            <div class="question-option" data-question="home">Where do you live?</div>
-            <div class="question-option" data-question="favorite">What's your favorite food?</div>
-            <div class="question-option" data-question="hobby">What do you like to do?</div>
-            <div class="question-option" data-question="dream">What's your dream?</div>
-        </div>
+        <!-- Shape 4 - Eye -->
+        <path d="M 83.54 125.96 C 80.876 124.964 80.015 120.68 81.618 116.392 C 83.221 112.103 86.681 109.434 89.345 110.43 C 92.009 111.426 92.87 115.709 91.267 119.998 C 89.664 124.286 86.204 126.956 83.54 125.96 Z" 
+              fill="#000000"/>
         
-        <div class="answer-display" id="answerDisplay">
-            <div id="answerText"></div>
-            <button class="back-btn" id="backBtn">Ask another question</button>
-        </div>
+        <!-- Shape 5 - Left ear -->
+        <path d="M 62.873 81.515 L 59.273 74.515 L 55.073 64.915 L 49.073 60.915 L 46.273 65.315 L 47.673 78.715 L 54.947 88.111 L 59.545 89.676 L 63.545 85.426 L 62.873 81.515 Z" 
+              fill="#BC4E45" stroke="#882F1C" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
         
-        <svg width="500" height="450" viewBox="40 60 480 400" xmlns="http://www.w3.org/2000/svg">
-            <!-- Horse body converted from the CoreGraphics paths -->
-            <path d="M132.673,269.035 L137.673,289.835 L147.173,310.785 L151.423,337.285 L153.173,360.285 L155.173,390.285 L153.923,405.535 L147.923,416.035 L139.173,426.285 L133.923,432.785 L148.923,436.535 L158.173,435.785 L162.423,428.535 L160.173,423.035 L165.923,412.285 C165.923,412.285 169.173,405.285 169.423,405.285 C169.673,405.285 171.673,384.035 171.673,384.035 L171.173,327.285 L170.173,293.785 L174.673,285.035 L132.673,269.035 Z" fill="rgb(228,173,95)" stroke="rgb(228,173,95)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Shape 6 - Right ear -->
+        <path d="M 96.969 70.904 L 93.169 63.504 L 85.769 56.504 L 85.169 64.104 L 84.569 72.104 L 86.603 79.965 L 94.291 82.84 C 94.291 82.84 97.169 78.304 97.169 78.304 C 97.169 78.304 96.969 70.904 96.969 70.904 Z" 
+              fill="#BC4E45" stroke="#882F1C" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        
+        <!-- Shape 7 - Right ear inner -->
+        <path d="M 88.084 72.265 C 87.644 69.328 88.535 66.867 90.073 66.767 C 91.612 66.667 93.215 68.967 93.655 71.904 C 94.094 74.84 93.203 77.302 91.665 77.402 C 90.127 77.501 88.523 75.202 88.084 72.265 Z" 
+              fill="#FA8776" stroke="#CF8A79" stroke-width="3"/>
+        
+        <!-- Shape 8 - Left ear inner -->
+        <path d="M 50.933 77.508 C 49.51 74.347 49.538 71.378 50.998 70.877 C 52.457 70.377 54.794 72.534 56.218 75.695 C 57.642 78.857 57.613 81.826 56.153 82.326 C 54.694 82.827 52.357 80.67 50.933 77.508 Z" 
+              fill="#FA8776" stroke="#CF8A79" stroke-width="3"/>
+        
+        <!-- Nostril details -->
+        <path d="M 57.145 176.541 C 56.587 178.946 54.263 180.37 51.956 179.722 C 49.65 179.074 48.232 176.6 48.791 174.195 C 49.35 171.79 51.673 170.366 53.98 171.014 C 56.287 171.662 57.704 174.136 57.145 176.541 Z" 
+              fill="#BC4E45" stroke="#882F1C" stroke-width="1"/>
+        
+        <path d="M 52.035 176.801 C 51.933 177.238 51.512 177.497 51.095 177.38 C 50.677 177.263 50.421 176.813 50.522 176.376 C 50.624 175.939 51.045 175.679 51.463 175.797 C 51.88 175.914 52.136 176.363 52.035 176.801 Z" 
+              fill="#FA8776" stroke="#CF8A79" stroke-width="1"/>
+        
+        <path d="M 54.291 175.36 C 54.553 175.013 55.035 174.977 55.366 175.28 C 55.698 175.583 55.754 176.11 55.491 176.457 C 55.229 176.804 54.747 176.839 54.416 176.536 C 54.084 176.233 54.028 175.707 54.291 175.36 Z" 
+              fill="#FA8776" stroke="#CF8A79" stroke-width="1"/>
+        
+        <path d="M 53.317 173.272 C 53.216 173.709 52.795 173.969 52.377 173.851 C 51.959 173.734 51.703 173.285 51.805 172.847 C 51.906 172.41 52.327 172.151 52.745 172.268 C 53.163 172.385 53.419 172.835 53.317 173.272 Z" 
+              fill="#FA8776" stroke="#CF8A79" stroke-width="1"/>
+        
+        <path d="M 68.829 173.92 C 68.27 176.325 65.947 177.749 63.64 177.101 C 61.333 176.453 59.916 173.979 60.474 171.574 C 61.033 169.169 63.357 167.745 65.663 168.393 C 67.97 169.04 69.387 171.515 68.829 173.92 Z" 
+              fill="#BC4E45" stroke="#882F1C" stroke-width="1"/>
+        
+        <path d="M 63.718 174.179 C 63.616 174.617 63.195 174.876 62.778 174.759 C 62.36 174.641 62.104 174.192 62.206 173.755 C 62.307 173.317 62.728 173.058 63.146 173.175 C 63.563 173.293 63.82 173.742 63.718 174.179 Z" 
+              fill="#FA8776" stroke="#CF8A79" stroke-width="1"/>
+        
+        <path d="M 65.974 172.738 C 66.237 172.391 66.718 172.356 67.049 172.658 C 67.381 172.961 67.437 173.488 67.174 173.835 C 66.912 174.182 66.43 174.218 66.099 173.915 C 65.768 173.612 65.712 173.085 65.974 172.738 Z" 
+              fill="#FA8776" stroke="#CF8A79" stroke-width="1"/>
+        
+        <path d="M 65 170.651 C 64.899 171.088 64.478 171.347 64.06 171.23 C 63.643 171.113 63.386 170.663 63.488 170.226 C 63.59 169.789 64.01 169.53 64.428 169.647 C 64.846 169.764 65.102 170.214 65 170.651 Z" 
+              fill="#FA8776" stroke="#CF8A79" stroke-width="1"/>
+    </svg>
+    
+    <div class="bg-layer">
+        <svg viewBox="400 200 1120 680" preserveAspectRatio="xMidYMid slice">
+            <!-- Blue Sky -->
+            <path d="M 0 0 L 1920 0 L 1920 1080 L 0 1080 Z" fill="#1779FE"/>
             
-            <path d="M176.673,282.535 L182.173,304.535 L188.673,330.035 L188.923,346.785 L191.673,357.285 L197.923,368.285 L201.673,385.035 L200.673,404.035 L199.923,415.785 L190.923,427.285 L184.423,432.785 L199.923,436.535 L212.173,434.535 L214.423,426.785 L209.423,419.035 L213.923,411.785 L217.173,408.535 L216.173,394.285 L209.173,377.035 L209.173,362.535 L206.923,323.785 L206.423,297.035 L205.173,282.285 L176.673,282.535 Z" fill="rgb(228,173,95)" stroke="rgb(228,173,95)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- First Green Hill Layer (darker green with curve) -->
+            <path d="M 0 593 
+                     L 178 580 
+                     L 361 569 
+                     L 474 562 
+                     L 603 559 
+                     L 713 559 
+                     L 792 560 
+                     C 792 560 877 565 877 566 
+                     C 877 567 942 573 942 573 
+                     L 1008 584 
+                     L 1090 593 
+                     L 1186 602 
+                     L 1309 613 
+                     L 1446 629 
+                     L 1576 646 
+                     L 1700 662 
+                     L 1813 672 
+                     L 1919 683 
+                     L 1920 1080 
+                     L 0 1080 Z" 
+                  fill="#1BAA3E"/>
             
-            <path d="M283.034,258.673 L299.434,280.873 L313.234,308.473 L327.034,332.273 L329.834,343.873 L335.434,353.873 L341.234,362.073 L342.234,397.273 L340.034,411.673 L333.234,425.873 L323.434,438.073 L347.434,439.334 L351.269,434.273 L348.434,425.873 L351.269,414.873 L357.634,402.073 L358.434,366.673 L358.034,340.473 L348.634,320.273 L338.234,307.473 C338.234,307.473 336.634,298.473 336.634,298.473 C336.634,298.473 341.434,276.673 341.434,276.673 L346.034,261.673 L347.234,247.473 L314.834,244.873 L283.034,258.673 Z" fill="rgb(228,173,95)" stroke="rgb(228,173,95)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-            
-            <path d="M325.328,250.673 L341.728,272.873 L355.528,300.473 L369.328,324.273 L372.128,335.873 L377.728,345.873 L383.528,354.073 L384.528,389.273 L382.328,403.673 L375.528,417.873 L365.728,430.073 L389.728,431.334 L393.563,426.273 L390.728,417.873 L393.563,406.873 L399.928,394.073 L400.728,358.673 L400.328,332.473 L390.928,312.273 L380.528,299.473 C380.528,299.473 378.928,290.473 378.928,290.473 C378.928,290.473 383.728,268.673 383.728,268.673 L388.328,253.673 L389.528,239.473 L357.128,236.873 L325.328,250.673 Z" fill="rgb(228,173,95)" stroke="rgb(228,173,95)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-            
-            <path d="M383.605,209.616 L401.526,218.014 L415.423,244.96 L420.51,278.321 L420.162,292.405 L424.974,313.873 L424.903,326.87 L425.752,349.225 L427.663,372.709 L434.141,395.511 L441.948,413.574 L456.052,415.537 L472.355,413.59 L471.619,387.451 L462.371,352.29 L452.253,316.298 L444.311,283.918 L436.448,254.936 C436.448,254.936 427.233,238.213 426.908,238.286 C426.583,238.359 409.679,210.193 409.679,210.193 L401.57,202.973 L379.94,200.181 L383.605,209.616 Z" fill="rgb(243,186,79)" stroke="rgb(238,223,154)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-            
-            <path d="M102.818,186.34 C102.818,186.34 113.162,204.169 113.162,204.169 C113.162,204.169 119.162,214.835 119.162,214.835 L119.162,230.835 L118.162,247.835 L122.496,263.835 L129.496,273.502 L146.496,282.502 L175.496,289.835 L216.829,287.835 L258.496,288.169 L286.162,282.169 L307.496,268.169 L320.829,257.502 L332.162,254.502 L389.496,250.169 L394.496,232.502 L393.829,213.169 L382.496,194.169 L356.829,173.169 L338.496,165.835 L310.162,168.865 L275.829,174.169 L242.162,175.169 L220.162,162.835 L192.162,151.835 L171.162,142.835 L154.496,133.502 L143.318,125.84 L102.818,186.34 Z" fill="rgb(168,46,14)"/>
-            
-            <path d="M116.421,234.644 L117.921,257.144 L132.673,277.644 L167.421,289.835 L199.421,289.835 L251.921,289.835 L286.162,282.169 L303.421,272.644 L325.328,261.644 L343.421,254.644 L373.921,253.644 L388.328,253.673 L394.496,241.144 L381.619,241.144 L354.921,247.644 L327.921,248.644 C327.921,248.644 301.921,259.644 301.921,260.644 C301.921,261.644 283.034,272.144 283.034,272.144 L239.421,279.644 L184.421,282.285 L139.921,269.035 L132.673,258.144 L126.921,236.873 Z" fill="rgb(228,173,95)" stroke="rgb(228,173,95)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-            
-            <!-- Head -->
-            <path d="M72.068,83.84 L61.318,94.09 L58.068,104.59 L55.068,111.84 L52.568,121.84 L52.318,143.34 L50.068,156.34 L44.068,165.59 L43.318,182.34 L51.318,193.84 L62.568,197.09 L71.818,193.59 L73.318,178.09 L80.318,166.34 L94.318,162.34 L98.318,176.09 L102.818,186.34 L143.318,125.84 L129.068,115.09 L113.568,104.34 L97.818,93.09 L87.568,85.34 L81.068,82.84 L72.068,83.84 Z" fill="rgb(228,173,95)" stroke="rgb(228,173,95)" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
-            
-            <!-- Ears -->
-            <path d="M69.369,85.265 L65.769,78.265 L61.569,68.665 L55.569,64.665 L52.769,69.065 L54.169,82.465 L61.443,91.861 L66.041,93.426 L70.041,89.176 L69.369,85.265 Z" fill="rgb(188,78,69)" stroke="rgb(136,47,28)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            
-            <path d="M93.969,77.865 L90.169,70.465 L82.769,63.465 L82.169,71.065 L81.569,79.065 L83.603,86.926 L91.291,89.801 C91.291,89.801 94.169,85.265 94.169,85.265 C94.169,85.265 93.969,77.865 93.969,77.865 Z" fill="rgb(188,78,69)" stroke="rgb(136,47,28)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            
-            <!-- Eyes -->
-            <ellipse cx="89.5" cy="118.9" rx="3" ry="4.5" fill="black"/>
-            <ellipse cx="52.5" cy="175.7" rx="2.5" ry="4.8" fill="black"/>
-            <ellipse cx="63.97" cy="173.67" rx="2.5" ry="4.8" fill="black"/>
-            
-            <!-- Nostrils -->
-            <ellipse cx="87.4" cy="78.55" rx="2.5" ry="4" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
-            <ellipse cx="61.4" cy="80.1" rx="3" ry="4" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
-            
-            <!-- Mane -->
-            <path d="M147.097,124.405 L164.519,134.946 L181.186,143.279 L201.853,151.279 L221.186,160.279 L237.186,168.865 L249.186,170.929 L276.186,170.929 L291.861,168.865 L304.519,165.613 L322.519,162.613 L337.519,161.279 L350.519,164.613 L361.186,170.929 L375.951,181.946 L381.619,190.937 L371.411,195.683 L357.211,194.283 L348.343,212.083 L329.722,205.683 L312.011,217.883 L300.011,206.283 L281.011,219.083 L261.211,208.883 L240.352,217.859 L228.811,208.083 L202.411,217.083 L182.152,202.259 L156.152,205.459 L149.811,183.683 L132.673,178.465 L140.352,160.259 L135.552,141.659 L147.097,124.405 Z" fill="rgb(243,186,79)" stroke="rgb(238,223,154)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-            
-            <!-- Mane spots/details -->
-            <ellipse cx="161.6" cy="155.15" rx="7" ry="8" fill="rgb(188,78,69)" stroke="rgb(136,47,28)" stroke-width="1"/>
-            <ellipse cx="158.7" cy="157.57" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
-            <ellipse cx="164.5" cy="154.06" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
-            <ellipse cx="161.6" cy="150.75" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
-            
-            <ellipse cx="193.5" cy="191.03" rx="7" ry="8" fill="rgb(188,78,69)" stroke="rgb(136,47,28)" stroke-width="1"/>
-            <ellipse cx="190.6" cy="193.46" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
-            <ellipse cx="196.4" cy="190.95" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
-            <ellipse cx="193.5" cy="187.48" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
-            
-            <ellipse cx="255.4" cy="195.27" rx="7" ry="8" fill="rgb(188,78,69)" stroke="rgb(136,47,28)" stroke-width="1"/>
-            <ellipse cx="252.5" cy="197.71" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
-            <ellipse cx="258.3" cy="195.27" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
-            <ellipse cx="255.4" cy="191.73" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
-            
-            <ellipse cx="277.4" cy="191.03" rx="7" ry="8" fill="rgb(188,78,69)" stroke="rgb(136,47,28)" stroke-width="1"/>
-            <ellipse cx="274.5" cy="193.46" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
-            <ellipse cx="280.3" cy="190.95" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
-            <ellipse cx="277.4" cy="187.48" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
-            
-            <ellipse cx="340.7" cy="182.88" rx="7" ry="8" fill="rgb(188,78,69)" stroke="rgb(136,47,28)" stroke-width="1"/>
-            <ellipse cx="337.9" cy="185.32" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
-            <ellipse cx="343.7" cy="182.88" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
-            <ellipse cx="340.8" cy="179.35" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
-            
-            <ellipse cx="165.5" cy="181.08" rx="7" ry="8" fill="rgb(188,78,69)" stroke="rgb(136,47,28)" stroke-width="1"/>
-            <ellipse cx="162.6" cy="183.52" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
-            <ellipse cx="168.4" cy="181.08" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
-            <ellipse cx="165.5" cy="177.55" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
-            
-            <ellipse cx="222.8" cy="189.44" rx="7" ry="8" fill="rgb(188,78,69)" stroke="rgb(136,47,28)" stroke-width="1"/>
-            <ellipse cx="219.9" cy="191.88" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
-            <ellipse cx="225.7" cy="189.44" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
-            <ellipse cx="222.8" cy="185.91" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
-            
-            <ellipse cx="314.8" cy="195.27" rx="7" ry="8" fill="rgb(188,78,69)" stroke="rgb(136,47,28)" stroke-width="1"/>
-            <ellipse cx="311.9" cy="197.71" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
-            <ellipse cx="317.7" cy="195.27" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
-            <ellipse cx="314.8" cy="191.73" rx="1.5" ry="2" fill="rgb(250,135,118)" stroke="rgb(207,138,121)" stroke-width="1"/>
-            
-            <!-- Mouth/smile -->
-            <path d="M66.91,195.614 C61.136,199.484 54.948,200.373 53.091,197.6 C51.233,194.828 57.785,194.189 63.559,190.319 C69.334,186.45 72.146,180.816 74.003,183.588 C75.861,186.361 72.685,191.745 66.91,195.614 Z" fill="rgb(166,64,56)"/>
-            
-            <!-- Neck/body lines -->
-            <path d="M101.56,187.646 L119.06,214.021 L117.31,233.271" stroke="rgb(228,173,95)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-            <path d="M380.943,192.212 L393.318,216.649 L393.568,240.649" stroke="rgb(238,223,154)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <!-- Second Green Hill Layer (lighter green with curve) -->
+            <path d="M 0 739 
+                     L 270 736 
+                     L 535 729 
+                     L 736 728 
+                     L 916 724 
+                     L 1120 722 
+                     L 1293 725 
+                     L 1450 719 
+                     L 1641 716 
+                     L 1799 706 
+                     L 1920 703 
+                     L 1920 1080 
+                     L 0 1080 Z" 
+                  fill="#21CB4B"/>
         </svg>
     </div>
-
-    <script>
-        const answers = {
-            name: "My name is Pizzy! Nice to meet you! 🍕",
-            home: "I live on the Windows XP wallpaper! You know, those beautiful green hills! (That is a hint) 💚",
-            favorite: "I absolutely love pizza! It's my favorite food ever! 🍕",
-            hobby: "I like to eat pizza! It's the best thing in the world! 🍕",
-            dream: "My dream is to make people happy! 😊"
-        };
-
-        const speechBubble = document.getElementById('speechBubble');
-        const questionMenu = document.getElementById('questionMenu');
-        const answerDisplay = document.getElementById('answerDisplay');
-        const answerText = document.getElementById('answerText');
-        const backBtn = document.getElementById('backBtn');
-        const questionOptions = document.querySelectorAll('.question-option');
-        const carrot = document.getElementById('carrot');
-        const feedZone = document.getElementById('feedZone');
-        const instruction = document.getElementById('instruction');
-        
-        let currentCarrotAvailable = true;
-        let isDragging = false;
-
-        // Dragging functionality
-        carrot.addEventListener('mousedown', startDrag);
-        carrot.addEventListener('touchstart', startDrag);
-
-        function startDrag(e) {
-            if (!currentCarrotAvailable) return;
-            e.preventDefault();
-            isDragging = true;
-            carrot.classList.add('dragging');
-            
-            // Remove transform and position absolutely
-            carrot.style.transform = 'none';
-            carrot.style.position = 'fixed';
-            
-            // Position carrot at mouse/touch position immediately
-            const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
-            const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
-            
-            carrot.style.left = (clientX - 25) + 'px'; // Center the emoji (50px / 2)
-            carrot.style.top = (clientY - 25) + 'px';
-        }
-
-        document.addEventListener('mousemove', drag);
-        document.addEventListener('touchmove', drag);
-
-        function drag(e) {
-            if (!isDragging) return;
-            e.preventDefault();
-            
-            const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
-            const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
-            
-            carrot.style.left = (clientX - 25) + 'px';
-            carrot.style.top = (clientY - 25) + 'px';
-        }
-
-        document.addEventListener('mouseup', stopDrag);
-        document.addEventListener('touchend', stopDrag);
-
-        function stopDrag(e) {
-            if (!isDragging) return;
-            isDragging = false;
-            carrot.classList.remove('dragging');
-            
-            const carrotRect = carrot.getBoundingClientRect();
-            const feedZoneRect = feedZone.getBoundingClientRect();
-            
-            // Check if carrot overlaps with feed zone
-            if (!(carrotRect.right < feedZoneRect.left || 
-                  carrotRect.left > feedZoneRect.right || 
-                  carrotRect.bottom < feedZoneRect.top || 
-                  carrotRect.top > feedZoneRect.bottom)) {
-                feedHorse();
-            } else {
-                // Return carrot to original position if not fed
-                resetCarrot();
-            }
-        }
-
-        function resetCarrot() {
-            carrot.style.position = 'absolute';
-            carrot.style.left = '10%';
-            carrot.style.top = '380px';
-            carrot.style.transform = 'translateX(-50%)';
-        }
-
-        function feedHorse() {
-            currentCarrotAvailable = false;
-            carrot.classList.add('eaten');
-            speechBubble.classList.add('fed');
-            speechBubble.querySelector('.bubble-text').textContent = 'Ask me a question! 🐴';
-        }
-
-        function spawnNewCarrot() {
-            currentCarrotAvailable = true;
-            carrot.classList.remove('eaten');
-            resetCarrot();
-        }
-
-        speechBubble.addEventListener('click', function() {
-            if (speechBubble.classList.contains('fed')) {
-                questionMenu.classList.add('active');
-                speechBubble.style.display = 'none';
-            }
-        });
-
-        questionOptions.forEach(option => {
-            option.addEventListener('click', function() {
-                const question = this.getAttribute('data-question');
-                answerText.textContent = answers[question];
-                questionMenu.classList.remove('active');
-                answerDisplay.classList.add('active');
+    <div class="container">
+        <svg width="500" height="700" viewBox="0 0 500 700">
+            <!-- Rose stem -->
+            <g class="stem">
+                <path d="M 311 641 C 288.909 641 256 572.014 256 490 C 256 407.986 245.909 326 268 326 C 290.091 326 288 385 285 476 C 282.298 557.97 333.091 641 311 641 Z" 
+                      fill="url(#stemGradient)" stroke="none"/>
                 
-                // Reset for next question
-                speechBubble.classList.remove('fed');
-                speechBubble.querySelector('.bubble-text').textContent = 'Feed me a carrot first! 🥕';
+                <defs>
+                    <linearGradient id="stemGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#228B22;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#32CD32;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#006400;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="leafGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#90EE90;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#228B22;stop-opacity:1" />
+                    </linearGradient>
+                    <radialGradient id="petalGradientPurple1" cx="50%" cy="30%" r="70%">
+                        <stop offset="0%" style="stop-color:#9370DB;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#663399;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#483D8B;stop-opacity:1" />
+                    </radialGradient>
+                    <radialGradient id="petalGradientPurple2" cx="50%" cy="30%" r="70%">
+                        <stop offset="0%" style="stop-color:#8A2BE2;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#6A0DAD;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#4B0082;stop-opacity:1" />
+                    </radialGradient>
+                    <radialGradient id="petalGradientPurple3" cx="50%" cy="30%" r="70%">
+                        <stop offset="0%" style="stop-color:#BA55D3;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#9932CC;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#8B008B;stop-opacity:1" />
+                    </radialGradient>
+                    <radialGradient id="petalGradientRed1" cx="50%" cy="30%" r="70%">
+                        <stop offset="0%" style="stop-color:#CD5C5C;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#DC143C;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#8B0000;stop-opacity:1" />
+                    </radialGradient>
+                    <radialGradient id="petalGradientRed2" cx="50%" cy="30%" r="70%">
+                        <stop offset="0%" style="stop-color:#B22222;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#8B0000;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#660000;stop-opacity:1" />
+                    </radialGradient>
+                    <radialGradient id="petalGradientRed3" cx="50%" cy="30%" r="70%">
+                        <stop offset="0%" style="stop-color:#DC143C;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#B22222;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#800000;stop-opacity:1" />
+                    </radialGradient>
+                </defs>
+            </g>
+            
+            <!-- Rose leaves -->
+            <path class="leaf" d="M 276.74 433.808 C 287.93 446.666 308.183 428.08 335.617 404.536 C 363.05 380.993 397.495 377.692 398.541 360.293 C 399.787 339.559 333.839 340.797 306.406 364.34 C 278.972 387.883 265.549 420.949 276.74 433.808 Z" 
+                  fill="url(#leafGradient)"/>
+            
+            <path class="leaf" d="M 129.614 392.738 C 120.883 411.334 148.751 423.04 184.795 439.752 C 220.839 456.464 238.7 491.218 257.289 483.202 C 279.442 473.648 250.547 404.444 214.503 387.732 C 178.459 371.02 138.345 374.142 129.614 392.738 Z" 
+                  fill="url(#leafGradient)"/>
+            
+            <!-- Rose petals (outer layer) -->
+            <g class="petal" data-id="1" data-layer="outer">
+                <path d="M 289.148 328.865 C 255.061 334.541 219.688 308.847 210.141 271.476 C 200.594 234.105 220.487 199.209 254.574 193.533 C 288.662 187.857 324.034 213.551 333.582 250.922 C 343.129 288.293 323.235 323.189 289.148 328.865 Z" 
+                      fill="url(#petalGradient1)"/>
+            </g>
+            
+            <g class="petal" data-id="2" data-layer="outer">
+                <path d="M 269.65 313.588 C 249.132 321.57 215.987 304.065 195.617 274.49 C 175.248 244.914 175.368 214.467 195.886 206.485 C 216.403 198.503 249.549 216.008 269.918 245.584 C 290.287 275.16 290.167 305.606 269.65 313.588 Z" 
+                      fill="url(#petalGradient1)"/>
+            </g>
+            
+            <g class="petal" data-id="3" data-layer="outer">
+                <path d="M 283.33 311.366 C 260.491 306.431 253.145 278.265 266.924 248.455 C 280.702 218.646 310.386 198.48 333.226 203.415 C 356.065 208.35 363.41 236.516 349.632 266.326 C 335.854 296.135 306.169 316.301 283.33 311.366 Z" 
+                      fill="url(#petalGradient1)"/>
+            </g>
+            
+            <g class="petal" data-id="4" data-layer="outer">
+                <path d="M 174.434 287.429 C 150.048 262.651 143.634 235.881 160.108 227.638 C 176.582 219.394 209.706 232.798 234.092 257.577 C 258.478 282.355 264.892 309.125 248.418 317.368 C 231.944 325.612 198.82 312.208 174.434 287.429 Z" 
+                      fill="url(#petalGradient1)"/>
+            </g>
+            
+            <g class="petal" data-id="5" data-layer="outer">
+                <path d="M 313.867 321.323 C 297.266 318.198 295.936 293.317 310.896 265.751 C 325.857 238.185 351.443 218.372 368.044 221.497 C 384.646 224.622 385.976 249.503 371.015 277.069 C 356.055 304.635 330.469 324.448 313.867 321.323 Z" 
+                      fill="url(#petalGradient1)"/>
+            </g>
+            
+            <!-- Rose petals (middle layer) -->
+            <g class="petal" data-id="6" data-layer="middle">
+                <path d="M 268.317 311.184 C 242.017 308.653 220.97 281.939 221.308 251.517 C 221.646 221.095 243.24 198.485 269.54 201.016 C 295.84 203.548 316.886 230.261 316.548 260.683 C 316.211 291.105 294.617 313.715 268.317 311.184 Z" 
+                      fill="url(#petalGradient2)"/>
+            </g>
+            
+            <g class="petal" data-id="7" data-layer="middle">
+                <path d="M 189.997 271.256 C 181.806 242.014 189.652 219.038 207.521 219.937 C 225.391 220.836 246.517 245.27 254.708 274.512 C 262.899 303.754 255.053 326.73 237.184 325.831 C 219.314 324.932 198.188 300.498 189.997 271.256 Z" 
+                      fill="url(#petalGradient2)"/>
+            </g>
+            
+            <g class="petal" data-id="8" data-layer="middle">
+                <path d="M 302.773 329.648 C 285.882 329.366 280.378 305.066 290.478 275.373 C 300.579 245.679 322.46 221.837 339.35 222.12 C 356.241 222.402 361.746 246.702 351.645 276.395 C 341.545 306.089 319.664 329.931 302.773 329.648 Z" 
+                      fill="url(#petalGradient2)"/>
+            </g>
+            
+            <!-- Rose petals (inner layer) -->
+            <g class="petal" data-id="9" data-layer="inner">
+                <path d="M 266.756 312.779 C 245.769 310.691 228.974 288.65 229.244 263.549 C 229.513 238.449 246.745 219.794 267.732 221.882 C 288.718 223.971 305.513 246.012 305.243 271.112 C 304.974 296.213 287.742 314.868 266.756 312.779 Z" 
+                      fill="url(#petalGradient3)"/>
+            </g>
+            
+            <g class="petal" data-id="10" data-layer="inner">
+                <path d="M 204.258 279.836 C 197.722 255.709 203.983 236.751 218.242 237.493 C 232.502 238.235 249.36 258.395 255.896 282.522 C 262.433 306.649 256.172 325.606 241.912 324.864 C 227.652 324.122 210.794 303.962 204.258 279.836 Z" 
+                      fill="url(#petalGradient3)"/>
+            </g>
+            
+            <g class="petal" data-id="11" data-layer="inner">
+                <path d="M 294.251 328.013 C 280.773 327.78 276.38 307.731 284.44 283.232 C 292.5 258.733 309.96 239.061 323.439 239.294 C 336.917 239.527 341.31 259.577 333.25 284.076 C 325.19 308.575 307.73 328.247 294.251 328.013 Z" 
+                      fill="url(#petalGradient3)"/>
+            </g>
+            
+            <!-- Center petals -->
+            <g class="petal" data-id="12" data-layer="center">
+                <path d="M 261.92 339.672 C 243.535 351.774 207.873 342.008 182.268 317.86 C 156.662 293.712 150.808 264.326 169.194 252.224 C 187.579 240.123 223.241 249.888 248.847 274.036 C 274.452 298.184 280.306 327.57 261.92 339.672 Z" 
+                      fill="url(#petalGradient2)"/>
+            </g>
+            
+            <g class="petal" data-id="13" data-layer="center">
+                <path d="M 283.198 331.665 C 264.349 320.436 266.9 292.446 288.896 269.147 C 310.892 245.849 344.004 236.064 362.853 247.294 C 381.702 258.523 379.151 286.513 357.155 309.812 C 335.159 333.11 302.047 342.894 283.198 331.665 Z" 
+                      fill="url(#petalGradient2)"/>
+            </g>
+            
+            <g class="petal" data-id="14" data-layer="center">
+                <path d="M 270.741 349.281 C 237.931 351.551 209.923 333.015 208.184 307.879 C 206.444 282.744 231.632 260.527 264.442 258.256 C 297.253 255.986 325.26 274.522 327 299.658 C 328.739 324.793 303.551 347.01 270.741 349.281 Z" 
+                      fill="url(#petalGradient2)"/>
+            </g>
+        </svg>
+    </div>
+    <script>
+        // Randomly assign red or purple gradients to petals (50/50 chance)
+        document.addEventListener('DOMContentLoaded', function() {
+            const petals = document.querySelectorAll('.petal path');
+            petals.forEach(petal => {
+                const currentFill = petal.getAttribute('fill');
+                const gradientNumber = currentFill.match(/\d+/)[0];
+                const isRed = Math.random() < 0.5;
+                const colorType = isRed ? 'Red' : 'Purple';
+                petal.setAttribute('fill', `url(#petalGradient${colorType}${gradientNumber})`);
             });
         });
-
-        backBtn.addEventListener('click', function() {
-            answerDisplay.classList.remove('active');
-            speechBubble.style.display = 'block';
-            
-            // Spawn new carrot for next question
-            spawnNewCarrot();
+        
+        const petals = document.querySelectorAll('.petal');
+        const container = document.querySelector('.container');
+        const fallAnimations = ['fall-straight', 'fall-spiral', 'fall-drift', 'fall-flutter', 'fall-tumble'];
+        let remainingPetals = petals.length;
+        let wishMade = false;
+        
+        petals.forEach(petal => {
+            petal.addEventListener('click', function(e) {
+                if (this.classList.contains('falling')) return;
+                
+                // Create sparkle effect at click point
+                createSparkles(e.clientX, e.clientY);
+                
+                // Add falling animation with random pattern
+                this.classList.add('falling');
+                const randomAnimation = fallAnimations[Math.floor(Math.random() * fallAnimations.length)];
+                this.classList.add(randomAnimation);
+                
+                // Create trailing particles
+                createPetalTrail(this);
+                
+                // Decrease remaining petals count
+                remainingPetals--;
+                
+                // Remove after animation
+                setTimeout(() => {
+                    this.remove();
+                    
+                    // Check if this was the last petal
+                    if (remainingPetals === 0) {
+                        showBirthdayMessage();
+                    }
+                }, 5000);
+            });
         });
+        
+        function showBirthdayMessage() {
+            // Fade out only the stem and leaves, not the background
+            const stem = document.querySelector('.stem');
+            const leaves = document.querySelectorAll('.leaf');
+            
+            stem.classList.add('fade-out');
+            leaves.forEach(leaf => leaf.classList.add('fade-out'));
+            
+            // Create confetti explosion
+            createConfetti();
+            
+            // Show birthday message after a short delay
+            setTimeout(() => {
+                const message = document.createElement('div');
+                message.className = 'birthday-message';
+                
+                // Create alternating red and blue letters
+                const text = "Happy Birthday!";
+                let html = '';
+                for (let i = 0; i < text.length; i++) {
+                    if (text[i] === ' ') {
+                        html += ' ';
+                    } else {
+                        const colorClass = i % 2 === 0 ? 'letter-red' : 'letter-blue';
+                        html += `<span class="${colorClass}">${text[i]}</span>`;
+                    }
+                }
+                message.innerHTML = html;
+                container.appendChild(message);
+                
+                // Add wish input field and send button after another delay
+                setTimeout(() => {
+                    const wishInput = document.createElement('input');
+                    wishInput.type = 'text';
+                    wishInput.className = 'wish-input';
+                    wishInput.placeholder = 'Make a wish...';
+                    wishInput.maxLength = 50;
+                    container.appendChild(wishInput);
+                    
+                    const sendButton = document.createElement('button');
+                    sendButton.className = 'send-button';
+                    sendButton.innerHTML = 'WISH';
+                    sendButton.onclick = function() {
+                        if (wishMade) {
+                            showWishModal('You can only make one wish!');
+                            return;
+                        }
+                        
+                        if (wishInput.value.trim()) {
+                            wishMade = true;
+                            sendButton.disabled = true;
+                            sendButton.innerHTML = 'SENT';
+                            wishInput.disabled = true;
+                            showWishModal('Your wish: "' + wishInput.value + '" has been sent to the universe! ✨');
+                        } else {
+                            showWishModal('Please make a wish first!');
+                        }
+                    };
+                    container.appendChild(sendButton);
+                    
+                    // Add message button
+                    const messageButton = document.createElement('button');
+                    messageButton.className = 'message-button';
+                    messageButton.innerHTML = 'GREETING';
+                    messageButton.onclick = function() {
+                        showMessage();
+                    };
+                    container.appendChild(messageButton);
+                }, 500);
+            }, 1000);
+        }
+        
+        function createConfetti() {
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.top = '-20px';
+                    confetti.style.animation = `confettiFall ${2 + Math.random() * 3}s ease-out forwards`;
+                    confetti.style.animationDelay = Math.random() * 2 + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 5000);
+                }, i * 50);
+            }
+        }
+        
+        function showMessage() {
+            const modal = document.createElement('div');
+            modal.className = 'message-modal show';
+            modal.innerHTML = `
+                <div class="message-content">
+                    <button class="close-button" onclick="this.parentElement.parentElement.remove()">×</button>
+                    <h2>Happy Birthday Yanelis! 🎉</h2>
+                    <p>Happy birthday Yanelis to your 16 Birthday. i only know for a month but your already my favorite person and that is the first time i actually make a present for a friend. i hope you like it but the AI did the most i just design the things the AI made the function. I don't know what i should say else now so HAPPY BIRTHDAY</p>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+        
+        function showWishModal(message) {
+            const modal = document.createElement('div');
+            modal.className = 'message-modal show';
+            modal.innerHTML = `
+                <div class="message-content">
+                    <button class="close-button" onclick="this.parentElement.parentElement.remove()">×</button>
+                    <h2>✨ Wish ✨</h2>
+                    <p>${message}</p>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+        
+        function createSparkles(x, y) {
+            for (let i = 0; i < 8; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.left = (x - 2) + 'px';
+                sparkle.style.top = (y - 2) + 'px';
+                sparkle.style.animationDelay = (i * 0.1) + 's';
+                document.body.appendChild(sparkle);
+                
+                setTimeout(() => sparkle.remove(), 1500);
+            }
+        }
+        
+        function createPetalTrail(petalElement) {
+            const rect = petalElement.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    const trail = document.createElement('div');
+                    trail.className = 'petal-trail';
+                    trail.style.left = (centerX + Math.random() * 20 - 10) + 'px';
+                    trail.style.top = (centerY + i * 100) + 'px';
+                    document.body.appendChild(trail);
+                    
+                    setTimeout(() => trail.remove(), 2000);
+                }, i * 500);
+            }
+        }
+        
+        // Gentle breathing animation for remaining petals
+        setInterval(() => {
+            petals.forEach(petal => {
+                if (!petal.classList.contains('falling')) {
+                    const randomScale = 0.98 + (Math.random() * 0.04);
+                    const randomRotation = (Math.random() - 0.5) * 2;
+                    petal.style.transform = `scale(${randomScale}) rotate(${randomRotation}deg)`;
+                }
+            });
+        }, 3000);
     </script>
 </body>
 </html>
