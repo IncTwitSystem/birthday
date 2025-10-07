@@ -432,10 +432,19 @@
     </div>
 
     <script>
+        // Simulated users to demonstrate functionality
+        const simulatedUsers = [
+            { name: "ALEX", status: "online" },
+            { name: "SAMANTHA", status: "online" },
+            { name: "MIKE", status: "online" },
+            { name: "JENNIFER", status: "online" }
+        ];
+
         const users = {};
         let currentUser = '';
         let activeChat = null;
         let chatMessages = {};
+        let connectionRequests = {};
 
         function joinNetwork() {
             const name = document.getElementById('nameInput').value.trim();
@@ -455,6 +464,17 @@
                 name: name,
                 timestamp: Date.now()
             };
+
+            // Add simulated users to the network
+            simulatedUsers.forEach(user => {
+                if (!users[user.name]) {
+                    users[user.name] = {
+                        name: user.name,
+                        timestamp: Date.now(),
+                        simulated: true
+                    };
+                }
+            });
 
             document.getElementById('userListSection').classList.remove('hidden');
             document.getElementById('nameInput').disabled = true;
@@ -483,9 +503,20 @@
                 if (user.name !== currentUser) {
                     const connectBtn = document.createElement('button');
                     connectBtn.className = 'connect-btn';
-                    connectBtn.textContent = '[ CONNECT ]';
+                    
+                    // Check if there's a pending connection request
+                    const requestKey = `${currentUser}-${user.name}`;
+                    const reverseKey = `${user.name}-${currentUser}`;
+                    
+                    if (connectionRequests[requestKey] || connectionRequests[reverseKey]) {
+                        connectBtn.disabled = true;
+                        connectBtn.textContent = '[ PENDING... ]';
+                    } else {
+                        connectBtn.textContent = '[ CONNECT ]';
+                        connectBtn.onclick = () => sendConnectionRequest(user.name);
+                    }
+                    
                     connectBtn.id = `connect-${user.name}`;
-                    connectBtn.onclick = () => sendConnectionRequest(user.name);
                     userItem.appendChild(connectBtn);
                 }
 
@@ -500,12 +531,28 @@
                 btn.textContent = '[ WAITING... ]';
             }
 
-            showNotification(currentUser, targetUser);
+            // Store the connection request
+            const requestKey = `${currentUser}-${targetUser}`;
+            connectionRequests[requestKey] = {
+                from: currentUser,
+                to: targetUser,
+                timestamp: Date.now()
+            };
+
+            // If it's a simulated user, auto-accept after a short delay
+            if (users[targetUser].simulated) {
+                setTimeout(() => {
+                    acceptConnection(currentUser, targetUser);
+                }, 1500);
+            } else {
+                showNotification(currentUser, targetUser);
+            }
         }
 
         function showNotification(fromUser, toUser) {
             const notification = document.createElement('div');
             notification.className = 'notification';
+            notification.id = `notification-${fromUser}-${toUser}`;
             notification.innerHTML = `
                 <div class="notification-title-bar">
                     ⚠️ CONNECTION REQUEST
@@ -513,8 +560,8 @@
                 <div class="notification-content">
                     <p><strong>${fromUser}</strong> wants to connect with you!</p>
                     <div class="notification-buttons">
-                        <button class="accept-btn" onclick="acceptConnection('${fromUser}', '${toUser}', this)">[ ACCEPT ]</button>
-                        <button class="decline-btn" onclick="declineConnection('${fromUser}', this)">[ DECLINE ]</button>
+                        <button class="accept-btn" onclick="acceptConnection('${fromUser}', '${toUser}')">[ ACCEPT ]</button>
+                        <button class="decline-btn" onclick="declineConnection('${fromUser}', '${toUser}')">[ DECLINE ]</button>
                     </div>
                 </div>
             `;
@@ -522,22 +569,39 @@
             document.body.appendChild(notification);
         }
 
-        function acceptConnection(fromUser, toUser, btn) {
-            const notification = btn.closest('.notification');
-            notification.remove();
+        function acceptConnection(fromUser, toUser) {
+            const notification = document.getElementById(`notification-${fromUser}-${toUser}`);
+            if (notification) {
+                notification.remove();
+            }
 
-            openChat(fromUser, toUser);
+            // Remove the connection request
+            const requestKey = `${fromUser}-${toUser}`;
+            delete connectionRequests[requestKey];
+
+            // If the current user is the one who received the request, open chat
+            if (currentUser === toUser) {
+                openChat(fromUser, toUser);
+            } else {
+                openChat(toUser, fromUser);
+            }
+
+            // Update the user list
+            renderUserList();
         }
 
-        function declineConnection(fromUser, btn) {
-            const notification = btn.closest('.notification');
-            notification.remove();
-
-            const connectBtn = document.getElementById(`connect-${fromUser}`);
-            if (connectBtn) {
-                connectBtn.disabled = false;
-                connectBtn.textContent = '[ CONNECT ]';
+        function declineConnection(fromUser, toUser) {
+            const notification = document.getElementById(`notification-${fromUser}-${toUser}`);
+            if (notification) {
+                notification.remove();
             }
+
+            // Remove the connection request
+            const requestKey = `${fromUser}-${toUser}`;
+            delete connectionRequests[requestKey];
+
+            // Update the user list
+            renderUserList();
         }
 
         function openChat(user1, user2) {
@@ -582,22 +646,32 @@
             messagesDiv.innerHTML = '';
 
             const messages = chatMessages[activeChat.key] || [];
-            messages.forEach(msg => {
-                const messageDiv = document.createElement('div');
-                messageDiv.className = `message ${msg.sender === currentUser ? 'sent' : 'received'}`;
-                
-                const senderDiv = document.createElement('div');
-                senderDiv.className = 'message-sender';
-                senderDiv.textContent = `[${msg.sender}]:`;
-                
-                const contentDiv = document.createElement('div');
-                contentDiv.className = 'message-content';
-                contentDiv.textContent = msg.text;
-                
-                messageDiv.appendChild(senderDiv);
-                messageDiv.appendChild(contentDiv);
-                messagesDiv.appendChild(messageDiv);
-            });
+            
+            if (messages.length === 0) {
+                const welcomeMsg = document.createElement('div');
+                welcomeMsg.className = 'message';
+                welcomeMsg.style.textAlign = 'center';
+                welcomeMsg.style.fontStyle = 'italic';
+                welcomeMsg.textContent = `You are now connected with ${activeChat.otherUser}. Start chatting!`;
+                messagesDiv.appendChild(welcomeMsg);
+            } else {
+                messages.forEach(msg => {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = `message ${msg.sender === currentUser ? 'sent' : 'received'}`;
+                    
+                    const senderDiv = document.createElement('div');
+                    senderDiv.className = 'message-sender';
+                    senderDiv.textContent = `[${msg.sender}]:`;
+                    
+                    const contentDiv = document.createElement('div');
+                    contentDiv.className = 'message-content';
+                    contentDiv.textContent = msg.text;
+                    
+                    messageDiv.appendChild(senderDiv);
+                    messageDiv.appendChild(contentDiv);
+                    messagesDiv.appendChild(messageDiv);
+                });
+            }
 
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
@@ -616,6 +690,28 @@
 
             input.value = '';
             renderMessages();
+            
+            // If it's a simulated user, simulate a response after a delay
+            if (users[activeChat.otherUser].simulated) {
+                setTimeout(() => {
+                    const responses = [
+                        "Hey there! How are you doing?",
+                        "Nice to connect with you!",
+                        "What brings you to RetroNet?",
+                        "I'm just testing out this retro chat system!",
+                        "This interface takes me back to the 90s!"
+                    ];
+                    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                    
+                    chatMessages[activeChat.key].push({
+                        sender: activeChat.otherUser,
+                        text: randomResponse,
+                        timestamp: Date.now()
+                    });
+                    
+                    renderMessages();
+                }, 2000);
+            }
         }
 
         function handleKeyPress(event) {
