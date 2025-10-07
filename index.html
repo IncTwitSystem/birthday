@@ -1,737 +1,106 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connect with Users - RetroNet</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<script>
+const ws = new WebSocket(`ws://${location.host}`);
+let currentUser = '';
+let activeChat = null;
 
-        body {
-            font-family: 'Courier New', monospace;
-            background: #008080;
-            background-image: 
-                repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,.03) 10px, rgba(0,0,0,.03) 20px);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data);
 
-        .container {
-            background: #c0c0c0;
-            border: 3px outset #ffffff;
-            box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.5);
-            max-width: 600px;
-            width: 100%;
-            padding: 0;
-        }
+  if (data.type === 'users') {
+    renderUserList(data.list);
+  }
 
-        .title-bar {
-            background: linear-gradient(to right, #000080, #1084d0);
-            color: white;
-            padding: 3px 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: bold;
-            font-size: 14px;
-        }
+  if (data.type === 'message') {
+    if (!chatMessages[data.from]) chatMessages[data.from] = [];
+    chatMessages[data.from].push({ sender: data.from, text: data.text });
+    if (activeChat?.otherUser === data.from) renderMessages();
+  }
+};
 
-        .window-buttons {
-            display: flex;
-            gap: 2px;
-        }
+function joinNetwork() {
+  const name = document.getElementById('nameInput').value.trim();
+  if (!name) return alert('Please enter your name!');
+  currentUser = name;
+  ws.send(JSON.stringify({ type: 'join', name }));
+  document.getElementById('nameInput').disabled = true;
+  document.getElementById('userListSection').classList.remove('hidden');
+}
 
-        .window-btn {
-            width: 16px;
-            height: 14px;
-            background: #c0c0c0;
-            border: 1px outset #ffffff;
-            font-size: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
+function renderUserList(list) {
+  const userListDiv = document.getElementById('userList');
+  userListDiv.innerHTML = '';
+  list.forEach(user => {
+    const div = document.createElement('div');
+    div.className = 'user-item' + (user === currentUser ? ' current-user' : '');
+    const span = document.createElement('span');
+    span.className = 'user-name';
+    span.textContent = user;
+    div.appendChild(span);
+    if (user !== currentUser) {
+      const btn = document.createElement('button');
+      btn.className = 'connect-btn';
+      btn.textContent = '[ CONNECT ]';
+      btn.onclick = () => openChat(user);
+      div.appendChild(btn);
+    }
+    userListDiv.appendChild(div);
+  });
+}
 
-        .content-area {
-            padding: 15px;
-        }
+const chatMessages = {};
 
-        h1 {
-            color: #000080;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 24px;
-            text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.5);
-        }
-
-        .input-section {
-            margin-bottom: 20px;
-            background: #ffffff;
-            border: 2px inset #808080;
-            padding: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #000000;
-        }
-
-        input[type="text"] {
-            width: 100%;
-            padding: 8px;
-            border: 2px inset #808080;
-            background: #ffffff;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-        }
-
-        input[type="text"]:focus {
-            outline: 1px dotted #000000;
-            outline-offset: -3px;
-        }
-
-        .join-btn {
-            width: 100%;
-            padding: 8px 16px;
-            background: #c0c0c0;
-            border: 2px outset #ffffff;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        .join-btn:active {
-            border-style: inset;
-        }
-
-        .user-list {
-            margin-top: 20px;
-            background: #ffffff;
-            border: 2px inset #808080;
-            padding: 15px;
-        }
-
-        .user-list h2 {
-            color: #000080;
-            margin-bottom: 15px;
-            font-size: 18px;
-            border-bottom: 2px solid #000080;
-            padding-bottom: 5px;
-        }
-
-        .user-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px;
-            background: #c0c0c0;
-            border: 2px outset #ffffff;
-            margin-bottom: 8px;
-        }
-
-        .user-name {
-            font-size: 14px;
-            color: #000000;
-            font-weight: bold;
-        }
-
-        .current-user {
-            background: #000080;
-            color: #ffffff;
-        }
-
-        .current-user .user-name {
-            color: #ffffff;
-        }
-
-        .current-user .user-name::after {
-            content: " (YOU)";
-            font-size: 12px;
-        }
-
-        .connect-btn {
-            padding: 5px 15px;
-            background: #c0c0c0;
-            border: 2px outset #ffffff;
-            cursor: pointer;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .connect-btn:active {
-            border-style: inset;
-        }
-
-        .connect-btn:disabled {
-            color: #808080;
-            cursor: not-allowed;
-        }
-
-        .notification {
-            position: fixed;
-            top: 50px;
-            right: 50px;
-            background: #c0c0c0;
-            border: 3px outset #ffffff;
-            box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.5);
-            max-width: 350px;
-            animation: slideIn 0.3s ease-out;
-            z-index: 1000;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        .notification-title-bar {
-            background: linear-gradient(to right, #000080, #1084d0);
-            color: white;
-            padding: 3px 5px;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        .notification-content {
-            padding: 20px;
-        }
-
-        .notification-content p {
-            margin-bottom: 15px;
-            color: #000000;
-            font-size: 14px;
-        }
-
-        .notification-buttons {
-            display: flex;
-            gap: 10px;
-        }
-
-        .accept-btn, .decline-btn {
-            flex: 1;
-            padding: 6px;
-            border: 2px outset #ffffff;
-            cursor: pointer;
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-            font-size: 12px;
-        }
-
-        .accept-btn {
-            background: #00ff00;
-            color: #000000;
-        }
-
-        .accept-btn:active {
-            border-style: inset;
-        }
-
-        .decline-btn {
-            background: #ff0000;
-            color: #ffffff;
-        }
-
-        .decline-btn:active {
-            border-style: inset;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .chat-container {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 450px;
-            height: 500px;
-            background: #c0c0c0;
-            border: 3px outset #ffffff;
-            box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.5);
-            display: flex;
-            flex-direction: column;
-            animation: slideUp 0.3s ease-out;
-            z-index: 999;
-        }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(600px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .chat-title-bar {
-            background: linear-gradient(to right, #000080, #1084d0);
-            color: white;
-            padding: 3px 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        .disconnect-btn {
-            background: #c0c0c0;
-            color: #000000;
-            border: 1px outset #ffffff;
-            padding: 2px 8px;
-            cursor: pointer;
-            font-family: 'Courier New', monospace;
-            font-size: 11px;
-            font-weight: bold;
-        }
-
-        .disconnect-btn:active {
-            border-style: inset;
-        }
-
-        .chat-messages {
-            flex: 1;
-            padding: 10px;
-            overflow-y: auto;
-            background: #ffffff;
-            border: 2px inset #808080;
-            margin: 5px;
-            font-size: 13px;
-        }
-
-        .message {
-            margin-bottom: 10px;
-            padding: 5px;
-            border: 1px solid #000000;
-        }
-
-        .message.sent {
-            background: #ffff00;
-            margin-left: 50px;
-        }
-
-        .message.received {
-            background: #00ffff;
-            margin-right: 50px;
-        }
-
-        .message-sender {
-            font-weight: bold;
-            margin-bottom: 3px;
-            color: #000080;
-        }
-
-        .message-content {
-            color: #000000;
-        }
-
-        .chat-input-area {
-            display: flex;
-            padding: 5px;
-            background: #c0c0c0;
-            gap: 5px;
-        }
-
-        .chat-input {
-            flex: 1;
-            padding: 5px;
-            border: 2px inset #808080;
-            background: #ffffff;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-        }
-
-        .send-btn {
-            background: #c0c0c0;
-            border: 2px outset #ffffff;
-            padding: 5px 15px;
-            cursor: pointer;
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-            font-size: 12px;
-        }
-
-        .send-btn:active {
-            border-style: inset;
-        }
-
-        @media (max-width: 768px) {
-            .chat-container {
-                width: 90%;
-                right: 5%;
-                bottom: 10px;
-            }
-
-            .notification {
-                right: 5%;
-                left: 5%;
-                max-width: none;
-            }
-        }
-
-        ::-webkit-scrollbar {
-            width: 16px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #c0c0c0;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #808080;
-            border: 2px outset #ffffff;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="title-bar">
-            <span>🖥️ RetroNet - User Connection</span>
-            <div class="window-buttons">
-                <div class="window-btn">_</div>
-                <div class="window-btn">□</div>
-                <div class="window-btn">X</div>
-            </div>
-        </div>
-        
-        <div class="content-area">
-            <h1>*** CONNECT WITH USERS ***</h1>
-            
-            <div class="input-section">
-                <label for="nameInput">ENTER YOUR FIRST NAME:</label>
-                <input type="text" id="nameInput" placeholder="Type your name here..." />
-                <button class="join-btn" onclick="joinNetwork()">[ JOIN NETWORK ]</button>
-            </div>
-
-            <div class="user-list hidden" id="userListSection">
-                <h2>&gt;&gt; ONLINE USERS &lt;&lt;</h2>
-                <div id="userList"></div>
-            </div>
-        </div>
+function openChat(otherUser) {
+  activeChat = { otherUser };
+  const existingChat = document.getElementById('activeChat');
+  if (existingChat) existingChat.remove();
+  const chatContainer = document.createElement('div');
+  chatContainer.className = 'chat-container';
+  chatContainer.id = 'activeChat';
+  chatContainer.innerHTML = `
+    <div class="chat-title-bar">
+      <span>💬 CHAT WITH ${otherUser}</span>
+      <button class="disconnect-btn" onclick="disconnectChat()">X</button>
     </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-area">
+      <input type="text" class="chat-input" id="messageInput" placeholder="Type message..." onkeypress="handleKeyPress(event)">
+      <button class="send-btn" onclick="sendMessage()">[ SEND ]</button>
+    </div>`;
+  document.body.appendChild(chatContainer);
+  renderMessages();
+}
 
-    <script>
-        // Simulated users to demonstrate functionality
-        const simulatedUsers = [
-            { name: "ALEX", status: "online" },
-            { name: "SAMANTHA", status: "online" },
-            { name: "MIKE", status: "online" },
-            { name: "JENNIFER", status: "online" }
-        ];
+function renderMessages() {
+  const messagesDiv = document.getElementById('chatMessages');
+  messagesDiv.innerHTML = '';
+  const msgs = chatMessages[activeChat.otherUser] || [];
+  msgs.forEach(m => {
+    const div = document.createElement('div');
+    div.className = 'message ' + (m.sender === currentUser ? 'sent' : 'received');
+    div.innerHTML = `<div class="message-sender">[${m.sender}]:</div><div class="message-content">${m.text}</div>`;
+    messagesDiv.appendChild(div);
+  });
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
 
-        const users = {};
-        let currentUser = '';
-        let activeChat = null;
-        let chatMessages = {};
-        let connectionRequests = {};
+function sendMessage() {
+  const input = document.getElementById('messageInput');
+  const text = input.value.trim();
+  if (!text) return;
+  const msg = { sender: currentUser, text };
+  if (!chatMessages[activeChat.otherUser]) chatMessages[activeChat.otherUser] = [];
+  chatMessages[activeChat.otherUser].push(msg);
+  renderMessages();
+  ws.send(JSON.stringify({ type: 'message', from: currentUser, to: activeChat.otherUser, text }));
+  input.value = '';
+}
 
-        function joinNetwork() {
-            const name = document.getElementById('nameInput').value.trim();
-            
-            if (name === '') {
-                alert('ERROR: Please enter your name!');
-                return;
-            }
+function handleKeyPress(event) {
+  if (event.key === 'Enter') sendMessage();
+}
 
-            if (users[name]) {
-                alert('ERROR: This name is already taken. Please choose another name.');
-                return;
-            }
-
-            currentUser = name;
-            users[name] = {
-                name: name,
-                timestamp: Date.now()
-            };
-
-            // Add simulated users to the network
-            simulatedUsers.forEach(user => {
-                if (!users[user.name]) {
-                    users[user.name] = {
-                        name: user.name,
-                        timestamp: Date.now(),
-                        simulated: true
-                    };
-                }
-            });
-
-            document.getElementById('userListSection').classList.remove('hidden');
-            document.getElementById('nameInput').disabled = true;
-            
-            renderUserList();
-        }
-
-        function renderUserList() {
-            const userListDiv = document.getElementById('userList');
-            userListDiv.innerHTML = '';
-
-            Object.values(users).forEach(user => {
-                const userItem = document.createElement('div');
-                userItem.className = 'user-item';
-                
-                if (user.name === currentUser) {
-                    userItem.classList.add('current-user');
-                }
-
-                const userName = document.createElement('span');
-                userName.className = 'user-name';
-                userName.textContent = user.name;
-
-                userItem.appendChild(userName);
-
-                if (user.name !== currentUser) {
-                    const connectBtn = document.createElement('button');
-                    connectBtn.className = 'connect-btn';
-                    
-                    // Check if there's a pending connection request
-                    const requestKey = `${currentUser}-${user.name}`;
-                    const reverseKey = `${user.name}-${currentUser}`;
-                    
-                    if (connectionRequests[requestKey] || connectionRequests[reverseKey]) {
-                        connectBtn.disabled = true;
-                        connectBtn.textContent = '[ PENDING... ]';
-                    } else {
-                        connectBtn.textContent = '[ CONNECT ]';
-                        connectBtn.onclick = () => sendConnectionRequest(user.name);
-                    }
-                    
-                    connectBtn.id = `connect-${user.name}`;
-                    userItem.appendChild(connectBtn);
-                }
-
-                userListDiv.appendChild(userItem);
-            });
-        }
-
-        function sendConnectionRequest(targetUser) {
-            const btn = document.getElementById(`connect-${targetUser}`);
-            if (btn) {
-                btn.disabled = true;
-                btn.textContent = '[ WAITING... ]';
-            }
-
-            // Store the connection request
-            const requestKey = `${currentUser}-${targetUser}`;
-            connectionRequests[requestKey] = {
-                from: currentUser,
-                to: targetUser,
-                timestamp: Date.now()
-            };
-
-            // If it's a simulated user, auto-accept after a short delay
-            if (users[targetUser].simulated) {
-                setTimeout(() => {
-                    acceptConnection(currentUser, targetUser);
-                }, 1500);
-            } else {
-                showNotification(currentUser, targetUser);
-            }
-        }
-
-        function showNotification(fromUser, toUser) {
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.id = `notification-${fromUser}-${toUser}`;
-            notification.innerHTML = `
-                <div class="notification-title-bar">
-                    ⚠️ CONNECTION REQUEST
-                </div>
-                <div class="notification-content">
-                    <p><strong>${fromUser}</strong> wants to connect with you!</p>
-                    <div class="notification-buttons">
-                        <button class="accept-btn" onclick="acceptConnection('${fromUser}', '${toUser}')">[ ACCEPT ]</button>
-                        <button class="decline-btn" onclick="declineConnection('${fromUser}', '${toUser}')">[ DECLINE ]</button>
-                    </div>
-                </div>
-            `;
-
-            document.body.appendChild(notification);
-        }
-
-        function acceptConnection(fromUser, toUser) {
-            const notification = document.getElementById(`notification-${fromUser}-${toUser}`);
-            if (notification) {
-                notification.remove();
-            }
-
-            // Remove the connection request
-            const requestKey = `${fromUser}-${toUser}`;
-            delete connectionRequests[requestKey];
-
-            // If the current user is the one who received the request, open chat
-            if (currentUser === toUser) {
-                openChat(fromUser, toUser);
-            } else {
-                openChat(toUser, fromUser);
-            }
-
-            // Update the user list
-            renderUserList();
-        }
-
-        function declineConnection(fromUser, toUser) {
-            const notification = document.getElementById(`notification-${fromUser}-${toUser}`);
-            if (notification) {
-                notification.remove();
-            }
-
-            // Remove the connection request
-            const requestKey = `${fromUser}-${toUser}`;
-            delete connectionRequests[requestKey];
-
-            // Update the user list
-            renderUserList();
-        }
-
-        function openChat(user1, user2) {
-            const chatKey = [user1, user2].sort().join('-');
-            
-            if (!chatMessages[chatKey]) {
-                chatMessages[chatKey] = [];
-            }
-
-            const otherUser = user1 === currentUser ? user2 : user1;
-            activeChat = { key: chatKey, otherUser: otherUser };
-
-            const existingChat = document.getElementById('activeChat');
-            if (existingChat) {
-                existingChat.remove();
-            }
-
-            const chatContainer = document.createElement('div');
-            chatContainer.className = 'chat-container';
-            chatContainer.id = 'activeChat';
-            chatContainer.innerHTML = `
-                <div class="chat-title-bar">
-                    <span>💬 CHAT WITH ${otherUser.toUpperCase()}</span>
-                    <button class="disconnect-btn" onclick="disconnectChat()">X</button>
-                </div>
-                <div class="chat-messages" id="chatMessages"></div>
-                <div class="chat-input-area">
-                    <input type="text" class="chat-input" id="messageInput" placeholder="Type message..." onkeypress="handleKeyPress(event)">
-                    <button class="send-btn" onclick="sendMessage()">[ SEND ]</button>
-                </div>
-            `;
-
-            document.body.appendChild(chatContainer);
-            renderMessages();
-            document.getElementById('messageInput').focus();
-        }
-
-        function renderMessages() {
-            if (!activeChat) return;
-
-            const messagesDiv = document.getElementById('chatMessages');
-            messagesDiv.innerHTML = '';
-
-            const messages = chatMessages[activeChat.key] || [];
-            
-            if (messages.length === 0) {
-                const welcomeMsg = document.createElement('div');
-                welcomeMsg.className = 'message';
-                welcomeMsg.style.textAlign = 'center';
-                welcomeMsg.style.fontStyle = 'italic';
-                welcomeMsg.textContent = `You are now connected with ${activeChat.otherUser}. Start chatting!`;
-                messagesDiv.appendChild(welcomeMsg);
-            } else {
-                messages.forEach(msg => {
-                    const messageDiv = document.createElement('div');
-                    messageDiv.className = `message ${msg.sender === currentUser ? 'sent' : 'received'}`;
-                    
-                    const senderDiv = document.createElement('div');
-                    senderDiv.className = 'message-sender';
-                    senderDiv.textContent = `[${msg.sender}]:`;
-                    
-                    const contentDiv = document.createElement('div');
-                    contentDiv.className = 'message-content';
-                    contentDiv.textContent = msg.text;
-                    
-                    messageDiv.appendChild(senderDiv);
-                    messageDiv.appendChild(contentDiv);
-                    messagesDiv.appendChild(messageDiv);
-                });
-            }
-
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }
-
-        function sendMessage() {
-            const input = document.getElementById('messageInput');
-            const text = input.value.trim();
-
-            if (text === '' || !activeChat) return;
-
-            chatMessages[activeChat.key].push({
-                sender: currentUser,
-                text: text,
-                timestamp: Date.now()
-            });
-
-            input.value = '';
-            renderMessages();
-            
-            // If it's a simulated user, simulate a response after a delay
-            if (users[activeChat.otherUser].simulated) {
-                setTimeout(() => {
-                    const responses = [
-                        "Hey there! How are you doing?",
-                        "Nice to connect with you!",
-                        "What brings you to RetroNet?",
-                        "I'm just testing out this retro chat system!",
-                        "This interface takes me back to the 90s!"
-                    ];
-                    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-                    
-                    chatMessages[activeChat.key].push({
-                        sender: activeChat.otherUser,
-                        text: randomResponse,
-                        timestamp: Date.now()
-                    });
-                    
-                    renderMessages();
-                }, 2000);
-            }
-        }
-
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                sendMessage();
-            }
-        }
-
-        function disconnectChat() {
-            const chatContainer = document.getElementById('activeChat');
-            if (chatContainer) {
-                chatContainer.remove();
-            }
-            activeChat = null;
-
-            renderUserList();
-        }
-    </script>
-</body>
-</html>
-
-
-
+function disconnectChat() {
+  document.getElementById('activeChat')?.remove();
+  activeChat = null;
+}
+</script>
