@@ -1,106 +1,136 @@
-<script>
-const ws = new WebSocket(`ws://${location.host}`);
-let currentUser = '';
-let activeChat = null;
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Pinball Game</title>
+    <style>
+        canvas {
+            border: 2px solid black;
+            background: #333;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="pinballCanvas" width="400" height="600"></canvas>
+    <script>
+        const canvas = document.getElementById('pinballCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Ball properties
+        let ball = {
+            x: 200,
+            y: 300,
+            radius: 10,
+            dx: 2,
+            dy: -2
+        };
 
-ws.onmessage = (event) => {
-  const data = JSON.parse(event.data);
+        // Paddle properties
+        let paddle = {
+            x: 150,
+            y: 550,
+            width: 100,
+            height: 10
+        };
 
-  if (data.type === 'users') {
-    renderUserList(data.list);
-  }
+        // Bumpers
+        let bumpers = [
+            {x: 100, y: 200, radius: 20},
+            {x: 300, y: 200, radius: 20},
+            {x: 200, y: 150, radius: 20}
+        ];
 
-  if (data.type === 'message') {
-    if (!chatMessages[data.from]) chatMessages[data.from] = [];
-    chatMessages[data.from].push({ sender: data.from, text: data.text });
-    if (activeChat?.otherUser === data.from) renderMessages();
-  }
-};
+        // Move paddle with mouse
+        canvas.addEventListener('mousemove', (e) => {
+            let rect = canvas.getBoundingClientRect();
+            paddle.x = e.clientX - rect.left - paddle.width/2;
+            
+            // Keep paddle within canvas
+            if (paddle.x < 0) paddle.x = 0;
+            if (paddle.x + paddle.width > canvas.width) {
+                paddle.x = canvas.width - paddle.width;
+            }
+        });
 
-function joinNetwork() {
-  const name = document.getElementById('nameInput').value.trim();
-  if (!name) return alert('Please enter your name!');
-  currentUser = name;
-  ws.send(JSON.stringify({ type: 'join', name }));
-  document.getElementById('nameInput').disabled = true;
-  document.getElementById('userListSection').classList.remove('hidden');
-}
+        function drawBall() {
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fillStyle = '#fff';
+            ctx.fill();
+            ctx.closePath();
+        }
 
-function renderUserList(list) {
-  const userListDiv = document.getElementById('userList');
-  userListDiv.innerHTML = '';
-  list.forEach(user => {
-    const div = document.createElement('div');
-    div.className = 'user-item' + (user === currentUser ? ' current-user' : '');
-    const span = document.createElement('span');
-    span.className = 'user-name';
-    span.textContent = user;
-    div.appendChild(span);
-    if (user !== currentUser) {
-      const btn = document.createElement('button');
-      btn.className = 'connect-btn';
-      btn.textContent = '[ CONNECT ]';
-      btn.onclick = () => openChat(user);
-      div.appendChild(btn);
-    }
-    userListDiv.appendChild(div);
-  });
-}
+        function drawPaddle() {
+            ctx.beginPath();
+            ctx.rect(paddle.x, paddle.y, paddle.width, paddle.height);
+            ctx.fillStyle = '#0095DD';
+            ctx.fill();
+            ctx.closePath();
+        }
 
-const chatMessages = {};
+        function drawBumpers() {
+            bumpers.forEach(bumper => {
+                ctx.beginPath();
+                ctx.arc(bumper.x, bumper.y, bumper.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#FF0000';
+                ctx.fill();
+                ctx.closePath();
+            });
+        }
 
-function openChat(otherUser) {
-  activeChat = { otherUser };
-  const existingChat = document.getElementById('activeChat');
-  if (existingChat) existingChat.remove();
-  const chatContainer = document.createElement('div');
-  chatContainer.className = 'chat-container';
-  chatContainer.id = 'activeChat';
-  chatContainer.innerHTML = `
-    <div class="chat-title-bar">
-      <span>💬 CHAT WITH ${otherUser}</span>
-      <button class="disconnect-btn" onclick="disconnectChat()">X</button>
-    </div>
-    <div class="chat-messages" id="chatMessages"></div>
-    <div class="chat-input-area">
-      <input type="text" class="chat-input" id="messageInput" placeholder="Type message..." onkeypress="handleKeyPress(event)">
-      <button class="send-btn" onclick="sendMessage()">[ SEND ]</button>
-    </div>`;
-  document.body.appendChild(chatContainer);
-  renderMessages();
-}
+        function checkCollisions() {
+            // Wall collisions
+            if (ball.x + ball.dx > canvas.width - ball.radius || 
+                ball.x + ball.dx < ball.radius) {
+                ball.dx = -ball.dx;
+            }
+            if (ball.y + ball.dy < ball.radius) {
+                ball.dy = -ball.dy;
+            }
 
-function renderMessages() {
-  const messagesDiv = document.getElementById('chatMessages');
-  messagesDiv.innerHTML = '';
-  const msgs = chatMessages[activeChat.otherUser] || [];
-  msgs.forEach(m => {
-    const div = document.createElement('div');
-    div.className = 'message ' + (m.sender === currentUser ? 'sent' : 'received');
-    div.innerHTML = `<div class="message-sender">[${m.sender}]:</div><div class="message-content">${m.text}</div>`;
-    messagesDiv.appendChild(div);
-  });
-  messagesDiv.scrollTop = messagesDiv.scrollHeight;
-}
+            // Paddle collision
+            if (ball.y + ball.dy > paddle.y - ball.radius &&
+                ball.x > paddle.x && 
+                ball.x < paddle.x + paddle.width) {
+                ball.dy = -ball.dy;
+            }
 
-function sendMessage() {
-  const input = document.getElementById('messageInput');
-  const text = input.value.trim();
-  if (!text) return;
-  const msg = { sender: currentUser, text };
-  if (!chatMessages[activeChat.otherUser]) chatMessages[activeChat.otherUser] = [];
-  chatMessages[activeChat.otherUser].push(msg);
-  renderMessages();
-  ws.send(JSON.stringify({ type: 'message', from: currentUser, to: activeChat.otherUser, text }));
-  input.value = '';
-}
+            // Bumper collisions
+            bumpers.forEach(bumper => {
+                let dx = ball.x - bumper.x;
+                let dy = ball.y - bumper.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < ball.radius + bumper.radius) {
+                    ball.dx = dx / distance * 5;
+                    ball.dy = dy / distance * 5;
+                }
+            });
 
-function handleKeyPress(event) {
-  if (event.key === 'Enter') sendMessage();
-}
+            // Game over
+            if (ball.y + ball.dy > canvas.height) {
+                ball.x = 200;
+                ball.y = 300;
+                ball.dx = 2;
+                ball.dy = -2;
+            }
+        }
 
-function disconnectChat() {
-  document.getElementById('activeChat')?.remove();
-  activeChat = null;
-}
-</script>
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            drawBumpers();
+            drawBall();
+            drawPaddle();
+            
+            checkCollisions();
+            
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+            
+            requestAnimationFrame(draw);
+        }
+
+        draw();
+    </script>
+</body>
+</html>
